@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Measured performance of qBittorrent, Deluge, Transmission, rTorrent, and rqbit: 150 phases, 225 GiB of synthetic transfers, CPU, memory, and reproducible Docker Compose methodology.">
+<meta name="color-scheme" content="light">
+<title>Torrent client comparison — measured performance &amp; memory</title>
+<style>
+:root{color-scheme:light;--ink:#192b38;--muted:#536773;--line:#dce3e8;--paper:#fff;--ground:#f5f7f8;--accent:#17618a;--green:#08795e;--soft:#eaf4ef;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:16px}
+*{box-sizing:border-box}.skip-link{position:absolute;top:10px;left:10px;z-index:10;background:white;padding:10px;transform:translateY(-200%)}.skip-link:focus{transform:translateY(0)}html{scroll-behavior:smooth;scroll-padding-top:95px}body{margin:0;background:var(--ground);color:var(--ink);line-height:1.7}a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}a:hover{color:var(--green)}:focus-visible{outline:3px solid #c97920;outline-offset:4px}header{background:var(--paper);border-bottom:1px solid var(--line)}.topline,.navigation,.page,footer{max-width:1180px;margin:auto;padding-left:40px;padding-right:40px}.topline{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-top:20px;padding-bottom:20px;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase}.brand{display:flex;gap:12px;align-items:center;font-weight:750}.brand-icon{display:grid;place-items:center;width:29px;height:29px;border-radius:6px;background:var(--ink);color:white;font-size:20px;line-height:1}.top-meta{color:var(--muted);font-size:.71rem}.nav-shell{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.97);border-bottom:1px solid var(--line)}.navigation{display:flex;gap:28px;overflow:auto;padding-top:13px;padding-bottom:13px}.navigation a{white-space:nowrap;font-size:.82rem;color:var(--muted);text-decoration:none;font-weight:600}.navigation a:hover{color:var(--accent)}.hero{padding:60px 0 10px}.eyebrow{margin:0 0 20px;color:var(--accent);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:750}h1{font-size:clamp(2.6rem,5.1vw,4.25rem);line-height:1.08;letter-spacing:-.045em;margin:0 0 22px;max-width:850px;font-weight:750}.hero-subtitle{font-size:1.08rem;color:var(--muted);max-width:660px;line-height:1.65;margin:0}.stats{display:grid;grid-template-columns:repeat(4,1fr);margin:34px 0 0;padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.stat{padding-left:28px;border-left:1px solid var(--line)}.stat:first-child{padding-left:0;border-left:0}.stat strong{font-size:2.1rem;letter-spacing:-.05em;display:block;line-height:1.2;font-weight:700}.stat strong span{font-size:1rem;letter-spacing:0}.stat small{color:var(--muted);font-size:.8rem}.lab-line{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;margin:17px 0 0;color:var(--muted);font-size:.77rem}.verified{color:var(--green);font-weight:650}.verified:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:7px}main section{padding:38px 0 40px;border-bottom:1px solid var(--line)}.section-heading{display:flex;align-items:baseline;gap:17px;margin-bottom:18px}.section-number{color:#718491;font-size:.75rem;font-weight:650;letter-spacing:.05em}h2{font-size:1.65rem;font-weight:700;letter-spacing:-.025em;margin:0;line-height:1.3}h3{font-size:1.05rem;line-height:1.4;margin:0;letter-spacing:-.01em}section>p{max-width:86ch;margin:16px 0;font-size:.98rem}strong{font-weight:700}code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.87em;background:#e9eef1;padding:.13em .3em;border-radius:3px;overflow-wrap:anywhere}pre{background:var(--ink);color:#e5f4f8;border-radius:9px;padding:24px;overflow:auto;line-height:1.85;font-size:.85rem;margin:24px 0 0}pre code{background:none;padding:0;color:inherit;font-size:inherit;white-space:pre}table{width:100%;border-collapse:collapse;background:white;font-size:.84rem;line-height:1.55;font-variant-numeric:tabular-nums}th,td{padding:13px 16px;text-align:left;vertical-align:top;border-bottom:1px solid #e7ecef}thead th{font-size:.73rem;color:#455e6c;font-weight:650;background:#eef3f5;vertical-align:bottom}tbody th{font-weight:650;white-space:nowrap}tbody tr:last-child>*{border-bottom:0}tbody tr:hover{background:#f6f9fa}.num{text-align:right;white-space:nowrap}.table-scroll{width:100%;overflow-x:auto;border:1px solid var(--line);border-radius:9px;margin:24px 0;background:white}.table-scroll:focus{outline-offset:3px}.table-scroll table{min-width:660px}.chart{margin:27px 0;background:white;border:1px solid var(--line);border-radius:10px;padding:27px 28px 20px}.chart-top{display:flex;align-items:flex-start;justify-content:space-between;gap:22px;margin-bottom:25px}.chart-top p{font-size:.79rem;color:var(--muted);margin:5px 0 0;max-width:49ch}.chart-control label{font-size:.7rem;color:var(--muted);display:block;margin-bottom:5px}select{font:inherit;font-size:.81rem;border:1px solid #b9c9d2;border-radius:5px;background:white;color:var(--ink);padding:8px 30px 8px 10px;max-width:100%}.bar-row{display:grid;grid-template-columns:130px 1fr 95px;gap:18px;align-items:center;padding:10px 0}.bar-name{font-size:.85rem;font-weight:600}.bar-track{position:relative;height:21px;background:#f0f4f6;border-radius:3px}.bar-fill{display:block;position:absolute;top:0;left:0;height:100%;background:#6595b2;border-radius:3px}.bar-fill.best{background:var(--green)}.bar-range{display:block;position:absolute;top:50%;height:2px;margin-top:-1px;background:var(--ink);min-width:1px}.bar-range:before,.bar-range:after{content:"";height:10px;width:1px;background:var(--ink);position:absolute;top:-4px}.bar-range:before{left:0}.bar-range:after{right:0}.bar-number{font-variant-numeric:tabular-nums;text-align:right;line-height:1.25}.bar-number strong{font-size:1rem}.bar-number small{display:block;font-size:.66rem;color:var(--muted);margin-top:3px}.chart figcaption{font-size:.72rem;color:var(--muted);border-top:1px solid var(--line);padding-top:15px;margin-top:18px;line-height:1.7}.legend-mark{display:inline-block;width:8px;height:8px;background:var(--green);margin-right:6px}.range-mark{display:inline-block;width:16px;border-top:2px solid var(--ink);vertical-align:middle;margin:0 6px 0 17px}.measurement-control{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:22px 0 0;font-size:.8rem}.measurement-control label{margin-right:10px;color:var(--muted)}.row-count{color:var(--muted);font-size:.76rem}.measurements table{min-width:1190px}.measurements th,.measurements td{padding:11px 12px}.measurements td:nth-child(2){white-space:nowrap}.cell-range{display:block;color:var(--muted);font-size:.68rem;margin-top:3px}.measurement-key{font-size:.79rem!important;color:var(--muted);max-width:none!important}.resource-links{display:flex;flex-wrap:wrap;gap:10px 25px;font-size:.84rem;margin:22px 0}.resources-note{color:var(--muted);font-size:.84rem!important}.source-list{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.82rem;margin:18px 0 0}.source-list a{white-space:nowrap}footer{padding-top:27px;padding-bottom:35px;color:var(--muted);font-size:.75rem;display:flex;justify-content:space-between;gap:15px}footer a{color:inherit}.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}
+@media(max-width:700px){.topline,.navigation,.page,footer{padding-left:22px;padding-right:22px}.topline{padding-top:15px;padding-bottom:15px}.top-meta{display:none}.navigation{gap:22px}.hero{padding-top:35px}h1{font-size:2.65rem}.hero-subtitle{font-size:.97rem}.stats{grid-template-columns:repeat(2,1fr);gap:22px 0;margin-top:26px}.stat{padding-left:20px}.stat:nth-child(3){padding-left:0;border:0}.stat strong{font-size:1.85rem}.lab-line{font-size:.72rem}main section{padding:29px 0 31px}.section-heading{gap:12px}h2{font-size:1.35rem}section>p{font-size:.92rem;line-height:1.75}.chart{padding:20px 15px 16px}.chart-top{flex-direction:column;gap:14px}.chart-control{width:100%}.chart-control select{width:100%}.bar-row{grid-template-columns:90px 1fr 68px;gap:9px;padding:11px 0}.bar-name{font-size:.73rem}.bar-track{height:18px}.bar-number strong{font-size:.87rem}.bar-number small{font-size:.59rem}.chart figcaption{font-size:.66rem}.range-mark{margin-left:9px}.measurement-control{flex-wrap:wrap}th,td{padding:11px 13px}pre{padding:18px;font-size:.72rem}footer{flex-direction:column}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{@page{size:A4 landscape;margin:15mm}body{background:white;color:black;font-size:10pt}.topline,.navigation,.page,footer{max-width:none;padding-left:0;padding-right:0}.nav-shell,.chart-control,.measurement-control,.top-meta{display:none!important}.hero{padding-top:0}h1{font-size:30pt}h2{font-size:17pt}.hero-subtitle{font-size:11pt}section>p{max-width:none;font-size:10pt}main section{padding:22px 0}.stats{margin-top:20px}.table-scroll{overflow:visible;border-radius:0}table,.table-scroll table,.measurements table{min-width:0;font-size:8pt}.measurements table{font-size:6.7pt}th,td,.measurements th,.measurements td{padding:6px}.table-scroll,.chart{break-inside:avoid}.measurements{break-inside:auto}tr{break-inside:avoid}thead{display:table-header-group}.chart{padding:18px}.chart-top{margin-bottom:12px}.bar-row{padding:6px 0}.cell-range{font-size:6.5pt}pre{background:#eee;color:black}a{color:inherit}h2,h3{break-after:avoid}tr[hidden]{display:table-row!important}footer{font-size:8pt}.lab-line{font-size:8pt}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to findings</a>
+<header><div class="topline"><span class="brand"><span class="brand-icon" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h13m-4-4 4 4-4 4M17 14H4m4-4-4 4 4 4"/></svg></span>Torrent client benchmarks</span><span class="top-meta">Local data · Private swarm · Reproducible</span></div></header>
+<div class="nav-shell"><nav class="navigation" aria-label="Report sections"><a href="#overview">Overview</a><a href="#transfer-results">Throughput</a><a href="#memory-and-cpu">Memory &amp; CPU</a><a href="#versions-and-conditions">Test setup</a><a href="#validation-and-collection-history">Validation</a><a href="#all-measurements">All measurements</a></nav></div>
+<div class="page">
+<div class="hero"><p class="eyebrow">Synthetic BitTorrent benchmark / 02 November 2026</p><h1>Torrent client<br>performance comparison.</h1><p class="hero-subtitle">qBittorrent, Deluge, Transmission, rTorrent, and rqbit, exercised in a closed Docker lab. Real transfers. Generated data.</p>
+<div class="stats" aria-label="Benchmark totals"><div class="stat"><strong>150</strong><small>accepted test phases</small></div><div class="stat"><strong>225 <span>GiB</span></strong><small>payload transferred</small></div><div class="stat"><strong>3</strong><small>repetitions per client</small></div><div class="stat"><strong>31,710</strong><small>SHA-256 file checks</small></div></div>
+<p class="lab-line"><a class="verified" href="results/comparison/validation.json">Payload verification passed</a><span>Native ARM64</span><span>2 CPU cores / 1,536 MiB per client</span><span>No public torrents</span></p></div>
+<main id="main"><section id="overview" aria-labelledby="heading-overview"><div class="section-heading"><span class="section-number">00</span><h2 id="heading-overview">Findings at a glance</h2></div><p>Measured on <strong>2026-11-02</strong>. rqbit offered the strongest combination of throughput and small application memory in this lab. qBittorrent had the fastest median large-file download. Transmission used little application memory but completed downloads more slowly. rTorrent used very little anonymous memory, with large file mappings and a repeatable upload startup delay. Deluge had the largest application memory footprint and highest CPU cost for the large download.</p>
+<p>These findings come from actual BitTorrent transfers: <strong>150 accepted phases, three repetitions per client, 225 GiB of payload</strong>. All data and torrent metadata were generated locally. The Compose runtime network was internal, with no public torrents, internet trackers, magnets, or published ports.</p></section>
+<section id="versions-and-conditions" aria-labelledby="heading-versions-and-conditions"><div class="section-heading"><span class="section-number">01</span><h2 id="heading-versions-and-conditions">Versions and conditions</h2></div><div class="table-scroll" role="region" tabindex="0" aria-label="Versions and conditions"><table><caption class="sr-only">Versions and conditions</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col">Tested stable version</th>
+<th scope="col">Distribution</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td>5.3.0; libtorrent 2.1.2</td>
+<td>Upstream official image</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td>2.2.0; libtorrent 2.0.13</td>
+<td>LinuxServer community image</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td>4.1.4</td>
+<td>LinuxServer community image</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td>0.16.27; Rakshasa libtorrent 0.16.27</td>
+<td>Checksum-verified upstream source build</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td>9.1.0</td>
+<td>Upstream author&#x27;s image</td>
+</tr>
+</tbody></table></div>
+<p>Stable releases were checked against upstream sources and installed binaries. Prebuilt images are pinned by digest. rTorrent&#x27;s base, source checksums, and APK versions are pinned; a fresh locked build reproduced both measured binary hashes. <a href="README.md#images-and-provenance">Image references and primary sources</a> document the choices where an upstream image was unavailable.</p>
+<p>The host was Docker Desktop 29.9.2, Linuxkit 7.0.14, native ARM64, with 8 virtual CPUs and 7.75 GiB of VM memory. Each client had a <strong>2-core quota, 1,536 MiB charged-memory limit, and no swap</strong>. Only one client ran at a time. Two independent reference seeders supplied downloads; two separate leechers received uploads. Each reference process also had two cores and 1,536 MiB. Data lived in Linux Docker volumes. Deluge includes its normal web process; rTorrent has no ruTorrent front end. This compares the selected deployable images and their libraries.</p></section>
+<section id="transfer-results" aria-labelledby="heading-transfer-results"><div class="section-heading"><span class="section-number">02</span><h2 id="heading-transfer-results">Transfer results</h2></div><p><strong>Median MiB/s across three repetitions</strong>, from API submission through client completion. This includes discovery, initialization, transfer, and completion reporting. Downloads then underwent independent filesystem SHA-256 verification outside the timer. Uploads count 8 GiB total: 4 GiB received and piece-verified by each of two leechers.</p>
+<figure class="chart" aria-labelledby="chart-title">
+<div class="chart-top"><div><h3 id="chart-title">4 GiB download</h3><p id="chart-description">Median throughput and observed min–max, MiB/s. Higher is faster.</p></div>
+<div class="chart-control" id="chart-control" hidden><label for="workload">Compare workload</label><select id="workload"><option value="download-large">4 GiB download</option><option value="download-files">2,048 files</option><option value="download-concurrent">64 torrents</option><option value="download-shaped">32 MiB/s capped</option><option value="upload-2-peers">Two-peer upload</option></select></div></div>
+<div id="chart-bars" aria-describedby="chart-description"><div class="bar-row"><span class="bar-name">qBittorrent</span><div class="bar-track" aria-hidden="true"><span class="bar-fill best" style="width:99.1644%"></span><span class="bar-range" style="left:87.0512%;width:12.9488%"></span></div><span class="bar-number"><strong>399.1</strong><small>350.4–402.5</small></span></div>
+<div class="bar-row"><span class="bar-name">Deluge</span><div class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:42.5075%"></span><span class="bar-range" style="left:41.0674%;width:3.5379%"></span></div><span class="bar-number"><strong>171.1</strong><small>165.3–179.5</small></span></div>
+<div class="bar-row"><span class="bar-name">Transmission</span><div class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:22.6549%"></span><span class="bar-range" style="left:22.4904%;width:0.2684%"></span></div><span class="bar-number"><strong>91.2</strong><small>90.5–91.6</small></span></div>
+<div class="bar-row"><span class="bar-name">rTorrent</span><div class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:63.8989%"></span><span class="bar-range" style="left:57.2371%;width:11.6101%"></span></div><span class="bar-number"><strong>257.2</strong><small>230.4–277.1</small></span></div>
+<div class="bar-row"><span class="bar-name">rqbit</span><div class="bar-track" aria-hidden="true"><span class="bar-fill" style="width:87.5642%"></span><span class="bar-range" style="left:83.7623%;width:5.3721%"></span></div><span class="bar-number"><strong>352.4</strong><small>337.1–358.8</small></span></div></div>
+<figcaption><span class="legend-mark"></span>Highest median <span class="range-mark"></span>Observed min–max across three repetitions. Ranges are not confidence intervals.</figcaption>
+</figure>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Transfer results"><table><caption class="sr-only">Transfer results</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">4 GiB download</th>
+<th scope="col" class="num">2,048 files, 1 GiB</th>
+<th scope="col" class="num">64 torrents, 1 GiB</th>
+<th scope="col" class="num">32 MiB/s capped</th>
+<th scope="col" class="num">Two-peer upload</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td class="num"><strong>399.1</strong></td>
+<td class="num">250.3</td>
+<td class="num">179.5</td>
+<td class="num">29.9</td>
+<td class="num">367.4</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td class="num">171.1</td>
+<td class="num">96.5</td>
+<td class="num">61.8</td>
+<td class="num">26.0</td>
+<td class="num">337.1</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td class="num">91.2</td>
+<td class="num">50.8</td>
+<td class="num">47.1</td>
+<td class="num">23.2</td>
+<td class="num">242.6</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td class="num">257.2</td>
+<td class="num">257.4</td>
+<td class="num">66.9</td>
+<td class="num">30.7</td>
+<td class="num">96.0</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num">352.4</td>
+<td class="num"><strong>349.4</strong></td>
+<td class="num"><strong>410.3</strong></td>
+<td class="num"><strong>31.5</strong></td>
+<td class="num"><strong>390.3</strong></td>
+</tr>
+</tbody></table></div>
+<p>rqbit led the many-file and concurrent medians. Its upload median also led, but the upload ranges overlap qBittorrent and Deluge. qBittorrent&#x27;s large downloads took 10.18–11.69 seconds, versus rqbit&#x27;s 11.42–12.15 seconds. Those close results should be read with the collection-order limitation below.</p>
+<p>Concurrency was variable. The 64-torrent rates ranged from <strong>99.6–247.4</strong> MiB/s for qBittorrent, <strong>39.4–64.8</strong> for Deluge, <strong>19.8–72.9</strong> for Transmission, <strong>37.0–395.2</strong> for rTorrent, and <strong>273.1–515.6</strong> for rqbit. Three repetitions do not support tight confidence intervals or a universal concurrency ranking.</p>
+<p>rTorrent&#x27;s upload took 84.93–88.18 seconds, with first verified payload at 60.43–61.22 seconds. Once transferring, its median 10–90% rate was <strong>337.5 MiB/s</strong>. Its poor overall upload rate here is largely a startup effect; the exact cause was not established. Transmission&#x27;s upload similarly improved from 242.6 MiB/s overall to 367.3 MiB/s in the active window.</p>
+<p>Among the four clients with retained capped-transfer diagnostics, active-window medians were approximately <strong>31.8–32.0 MiB/s</strong>. rTorrent&#x27;s diagnostic was suppressed because its progress counter reset. Overall rates differ mainly because a roughly 32-second transfer magnifies discovery/startup costs. The case caps the seeders&#x27; payload rate; it does not emulate WAN latency or packet loss.</p>
+<p>Some API progress counters reset during initialization/hash checking. Their startup/active-rate diagnostics are suppressed, including rqbit&#x27;s large-download diagnostics and rTorrent&#x27;s large/many-file/capped diagnostics. Raw samples remain available. Completed-payload wall rates do not depend on those counters&#x27; slope.</p></section>
+<section id="memory-and-cpu" aria-labelledby="heading-memory-and-cpu"><div class="section-heading"><span class="section-number">03</span><h2 id="heading-memory-and-cpu">Memory and CPU</h2></div><p>Memory below is <strong>MiB</strong>. Idle figures are medians of each repetition&#x27;s sampled median; peaks are the highest sample across all workloads and repetitions.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Memory and CPU"><table><caption class="sr-only">Memory and CPU</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">Empty idle RSS</th>
+<th scope="col" class="num">1,000 paused RSS</th>
+<th scope="col" class="num">Peak anonymous memory</th>
+<th scope="col" class="num">Peak summed process RSS</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td class="num">33.7</td>
+<td class="num">52.1</td>
+<td class="num">131.8</td>
+<td class="num">158.9</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td class="num">138.8</td>
+<td class="num">180.2</td>
+<td class="num">222.2</td>
+<td class="num">3,340.8</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td class="num">16.1</td>
+<td class="num">25.3</td>
+<td class="num">67.0</td>
+<td class="num">81.0</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td class="num">13.0</td>
+<td class="num">30.8</td>
+<td class="num">18.7</td>
+<td class="num">1,429.2</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num"><strong>9.6</strong></td>
+<td class="num"><strong>17.1</strong></td>
+<td class="num"><strong>12.3</strong></td>
+<td class="num"><strong>23.7</strong></td>
+</tr>
+</tbody></table></div>
+<p>Anonymous memory helps distinguish application state from resident file mappings. At 1,000 paused torrents, median anonymous allocations were 22.1 MiB for qBittorrent, 119.5 for Deluge, 11.2 for Transmission, 18.7 for rTorrent, and 5.8 for rqbit. rqbit&#x27;s small footprint persisted through this metadata load. Deluge&#x27;s web/daemon processes contribute to its higher baseline.</p>
+<p><strong>RSS is not a minimum-RAM requirement.</strong> It includes shared and mapped file pages. Deluge&#x27;s largest RSS sample occurred during rechecking; rTorrent&#x27;s during the large download. Shared file pages may be charged to another cgroup after a verifier or peer reads them, so process RSS can exceed the container&#x27;s charged memory cap. Summed RSS can also double count shared pages. All clients approached the roughly 1.5 GiB charged-memory cap during data-heavy phases, largely through filesystem cache. The raw records retain total, anonymous, file-cache, and Docker-style working-set counters separately. No accepted client was OOM-killed.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Memory and CPU"><table><caption class="sr-only">Memory and CPU</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">Large download CPU, core-s</th>
+<th scope="col" class="num">Upload CPU, core-s</th>
+<th scope="col" class="num">4 GiB recheck, s</th>
+<th scope="col" class="num">Register 1,000 paused, s</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td class="num">11.89</td>
+<td class="num">19.15</td>
+<td class="num">4.08</td>
+<td class="num">1.34</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td class="num">36.09</td>
+<td class="num">27.40</td>
+<td class="num">3.65</td>
+<td class="num">2.38</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td class="num">9.42</td>
+<td class="num">11.50</td>
+<td class="num">2.54</td>
+<td class="num">0.43</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td class="num">12.70</td>
+<td class="num">10.75</td>
+<td class="num">2.74</td>
+<td class="num">0.91</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num">16.92</td>
+<td class="num">19.75</td>
+<td class="num">2.49</td>
+<td class="num">1.40</td>
+</tr>
+</tbody></table></div>
+<p>CPU values are median cgroup CPU consumption, not elapsed time: two busy cores for one second consume two core-seconds. Lower CPU can accompany slower transfers. Deluge&#x27;s large-download CPU cost was about three times qBittorrent&#x27;s. The cached rechecks measure hashing plus API/state transitions. rqbit has no force-recheck endpoint, so it forgets and re-adds existing files to invoke its initialization hash check. Every accepted recheck visibly entered checking. Catalog timings include the client&#x27;s API and initialization behavior, not just internal insertion speed. Fifteen-second idle windows do not test memory leaks.</p></section>
+<section id="validation-and-collection-history" aria-labelledby="heading-validation-and-collection-history"><div class="section-heading"><span class="section-number">04</span><h2 id="heading-validation-and-collection-history">Validation and collection history</h2></div><p>The <a href="results/comparison/validation.json">automated audit</a> confirms 60 downloaded workloads, 31,710 filesystem file checks, 15 observed rechecks, and 30 complete upload receivers. Selected payload totals are <strong>105 GiB downloaded and 120 GiB uploaded</strong>. Each client&#x27;s measured network RX/TX exceeds its respective complete payload. Upload leechers recorded zero uploaded payload, zero failed hash bytes, and full received payloads. The tracker excludes sibling leechers from each other&#x27;s discovery even after completion. There were no accepted timeouts.</p>
+<p>The first long run stopped when qBittorrent reported completion but immediate filesystem verification found a mismatch. After clean shutdown, all 2,048 files matched their expected hashes. This is consistent with deferred disk visibility; the exact cause was not established and no persistent corruption was observed. The harness now requires qBittorrent&#x27;s seed-ready state, retries and discloses transient verification failures, and fails persistent mismatches. Recheck monitoring also now requires observing checking rather than inferring work from CPU usage. <strong>Every baseline qBittorrent case was replaced with three complete new repetitions</strong>, all of which passed verification on the first attempt. The final Deluge repetition was completed separately. Unaffected baseline cases were retained without choosing the fastest results.</p>
+<p>The baseline rotated client order; corrective passes occurred later. System drift and cache state can therefore affect close comparisons. Source runs, the original failure, a post-failure diagnostic, and an explicit <a href="results/comparison/selection.json">selection rule</a> are retained. This was not one uninterrupted 150-phase run. Ambiguous progress diagnostics were recalculated from the original samples; wall times and resource counters were preserved.</p></section>
+<section id="scope-and-reproduction" aria-labelledby="heading-scope-and-reproduction"><div class="section-heading"><span class="section-number">05</span><h2 id="heading-scope-and-reproduction">Scope and reproduction</h2></div><p>This is a local TCP benchmark with generated private v1 torrents, mostly warm Linux caches, two reference peers, and fixed resource limits. It establishes observed performance for these images and workloads. It does not establish maximum throughput independent of reference CPU/storage limits, cold HDD behavior, encrypted/VPN transfers, internet peer diversity, v2 metadata, latency/loss tolerance, or long-term memory use. Reference-peer CPU, throttling, network, and block-I/O counters are retained to inspect lab bottlenecks.</p>
+<p>Run <code>./run.sh --output my-run --repeats 3</code>, then <code>python3 bench/summarize.py results/my-run</code> and <code>python3 bench/validate_results.py results/my-run</code>. The <a href="README.md">README</a> contains setup, isolation details, complete methodology, and commands to reconstruct the published selection from archived evidence. All 50 client/workload groups, variation, CPU, memory, and valid active-window rates are in <a href="results/comparison/SUMMARY.md">SUMMARY.md</a>, <a href="results/comparison/summary.csv">summary.csv</a>, and <a href="results/comparison/trials.json">trials.json</a>.</p>
+<pre aria-label="Reproduce the benchmark"><code>./run.sh --output my-run --repeats 3
+python3 bench/summarize.py results/my-run
+python3 bench/validate_results.py results/my-run</code></pre></section>
+<section id="all-measurements" aria-labelledby="heading-all-measurements"><div class="section-heading"><span class="section-number">06</span><h2 id="heading-all-measurements">All measurements</h2></div>
+<p>Every client and workload, with all three repetitions included. Rates and times are medians; the smaller time range is the observed minimum–maximum. Memory is in MiB. Recheck rates are cached hash-check throughput, not network throughput.</p>
+<div class="measurement-control" id="measurement-control" hidden><div><label for="client-filter">Show client</label><select id="client-filter"><option value="all">All clients</option><option value="qbittorrent">qBittorrent</option><option value="deluge">Deluge</option><option value="transmission">Transmission</option><option value="rtorrent">rTorrent</option><option value="rqbit">rqbit</option></select></div><span class="row-count" id="row-count" role="status">50 of 50 groups</span></div>
+<div class="table-scroll measurements" role="region" tabindex="0" aria-label="All 50 measurement groups; scroll horizontally for memory counters"><table id="measurements"><caption class="sr-only">All 50 client and workload groups, each with three repetitions</caption><thead><tr><th scope="col">Client</th><th scope="col">Workload</th><th scope="col" class="num">n</th><th scope="col" class="num">Time, s<br>median / min–max</th><th scope="col" class="num">Rate<br>MiB/s</th><th scope="col" class="num">CPU<br>core-s</th><th scope="col" class="num">Median<br>RSS</th><th scope="col" class="num">Peak<br>RSS</th><th scope="col" class="num">Peak<br>anonymous</th><th scope="col" class="num">Peak<br>container</th><th scope="col" class="num">Peak<br>working set</th></tr></thead><tbody><tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>Empty idle</td><td class="num">3</td><td class="num">15.01<small class="cell-range">15.01–15.01</small></td><td class="num">—</td><td class="num">0.01</td><td class="num">33.7</td><td class="num">34.0</td><td class="num">4.8</td><td class="num">62.0</td><td class="num">61.1</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>4 GiB download</td><td class="num">3</td><td class="num">10.26<small class="cell-range">10.18–11.69</small></td><td class="num">399.1</td><td class="num">11.89</td><td class="num">78.2</td><td class="num">158.9</td><td class="num">128.3</td><td class="num">1,550.6</td><td class="num">239.6</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>4 GiB recheck</td><td class="num">3</td><td class="num">4.08<small class="cell-range">3.41–4.52</small></td><td class="num">1004.4</td><td class="num">3.41</td><td class="num">66.1</td><td class="num">78.6</td><td class="num">48.7</td><td class="num">1,391.1</td><td class="num">100.4</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>Two-peer upload</td><td class="num">3</td><td class="num">22.30<small class="cell-range">19.90–22.90</small></td><td class="num">367.4</td><td class="num">19.15</td><td class="num">39.6</td><td class="num">69.2</td><td class="num">39.3</td><td class="num">1,536.0</td><td class="num">365.3</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>2,048 files</td><td class="num">3</td><td class="num">4.09<small class="cell-range">2.84–4.30</small></td><td class="num">250.3</td><td class="num">2.74</td><td class="num">87.7</td><td class="num">152.4</td><td class="num">131.8</td><td class="num">1,136.9</td><td class="num">189.3</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>64 torrents</td><td class="num">3</td><td class="num">5.70<small class="cell-range">4.14–10.29</small></td><td class="num">179.5</td><td class="num">2.74</td><td class="num">72.2</td><td class="num">119.7</td><td class="num">87.6</td><td class="num">1,129.2</td><td class="num">114.4</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>64 seeds idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.03</td><td class="num">71.8</td><td class="num">103.7</td><td class="num">73.7</td><td class="num">1,129.1</td><td class="num">104.5</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>Capped download</td><td class="num">3</td><td class="num">34.27<small class="cell-range">34.24–34.36</small></td><td class="num">29.9</td><td class="num">3.78</td><td class="num">43.7</td><td class="num">53.7</td><td class="num">22.8</td><td class="num">1,075.1</td><td class="num">53.0</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>Register 1,000 paused</td><td class="num">3</td><td class="num">1.34<small class="cell-range">1.33–1.35</small></td><td class="num">—</td><td class="num">0.62</td><td class="num">50.4</td><td class="num">53.0</td><td class="num">22.7</td><td class="num">36.3</td><td class="num">28.3</td></tr>
+<tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>1,000 paused idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.00</small></td><td class="num">—</td><td class="num">0.02</td><td class="num">52.1</td><td class="num">53.0</td><td class="num">22.7</td><td class="num">36.2</td><td class="num">28.2</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>Empty idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.09</td><td class="num">138.8</td><td class="num">140.4</td><td class="num">79.9</td><td class="num">160.5</td><td class="num">140.9</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>4 GiB download</td><td class="num">3</td><td class="num">23.94<small class="cell-range">22.81–24.78</small></td><td class="num">171.1</td><td class="num">36.09</td><td class="num">1,349.1</td><td class="num">1,500.0</td><td class="num">214.3</td><td class="num">1,554.7</td><td class="num">1,413.9</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>4 GiB recheck</td><td class="num">3</td><td class="num">3.65<small class="cell-range">3.20–3.99</small></td><td class="num">1121.8</td><td class="num">3.07</td><td class="num">884.3</td><td class="num">3,340.8</td><td class="num">104.4</td><td class="num">1,536.0</td><td class="num">428.1</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>Two-peer upload</td><td class="num">3</td><td class="num">24.30<small class="cell-range">21.85–27.75</small></td><td class="num">337.1</td><td class="num">27.40</td><td class="num">899.6</td><td class="num">1,360.8</td><td class="num">104.5</td><td class="num">1,536.0</td><td class="num">1,511.8</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>2,048 files</td><td class="num">3</td><td class="num">10.62<small class="cell-range">10.45–10.99</small></td><td class="num">96.5</td><td class="num">5.54</td><td class="num">146.7</td><td class="num">165.1</td><td class="num">106.3</td><td class="num">1,193.3</td><td class="num">156.2</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>64 torrents</td><td class="num">3</td><td class="num">16.57<small class="cell-range">15.80–26.01</small></td><td class="num">61.8</td><td class="num">5.78</td><td class="num">147.4</td><td class="num">462.8</td><td class="num">222.2</td><td class="num">1,180.8</td><td class="num">254.7</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>64 seeds idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.08</td><td class="num">160.0</td><td class="num">165.1</td><td class="num">104.1</td><td class="num">1,165.2</td><td class="num">140.4</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>Capped download</td><td class="num">3</td><td class="num">39.35<small class="cell-range">39.32–39.35</small></td><td class="num">26.0</td><td class="num">9.10</td><td class="num">519.0</td><td class="num">1,163.1</td><td class="num">91.6</td><td class="num">1,147.4</td><td class="num">126.9</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>Register 1,000 paused</td><td class="num">3</td><td class="num">2.38<small class="cell-range">2.36–2.54</small></td><td class="num">—</td><td class="num">3.10</td><td class="num">161.6</td><td class="num">182.7</td><td class="num">122.0</td><td class="num">133.8</td><td class="num">129.5</td></tr>
+<tr data-client="deluge"><th scope="row">Deluge</th><td>1,000 paused idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.00</small></td><td class="num">—</td><td class="num">0.09</td><td class="num">180.2</td><td class="num">182.7</td><td class="num">122.0</td><td class="num">134.1</td><td class="num">129.1</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>Empty idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.04</td><td class="num">16.1</td><td class="num">16.2</td><td class="num">2.1</td><td class="num">32.0</td><td class="num">28.9</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>4 GiB download</td><td class="num">3</td><td class="num">44.92<small class="cell-range">44.72–45.25</small></td><td class="num">91.2</td><td class="num">9.42</td><td class="num">23.3</td><td class="num">24.3</td><td class="num">10.2</td><td class="num">1,537.1</td><td class="num">118.4</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>4 GiB recheck</td><td class="num">3</td><td class="num">2.54<small class="cell-range">2.43–2.90</small></td><td class="num">1615.2</td><td class="num">2.21</td><td class="num">16.7</td><td class="num">16.8</td><td class="num">2.6</td><td class="num">1,535.8</td><td class="num">70.7</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>Two-peer upload</td><td class="num">3</td><td class="num">33.76<small class="cell-range">33.71–34.29</small></td><td class="num">242.6</td><td class="num">11.50</td><td class="num">80.3</td><td class="num">81.0</td><td class="num">67.0</td><td class="num">1,536.0</td><td class="num">1,089.7</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>2,048 files</td><td class="num">3</td><td class="num">20.15<small class="cell-range">19.80–20.36</small></td><td class="num">50.8</td><td class="num">2.00</td><td class="num">18.0</td><td class="num">23.1</td><td class="num">9.0</td><td class="num">1,067.0</td><td class="num">51.7</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>64 torrents</td><td class="num">3</td><td class="num">21.76<small class="cell-range">14.04–51.83</small></td><td class="num">47.1</td><td class="num">2.12</td><td class="num">32.0</td><td class="num">63.9</td><td class="num">49.7</td><td class="num">1,086.4</td><td class="num">448.5</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>64 seeds idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.00</small></td><td class="num">—</td><td class="num">0.10</td><td class="num">18.7</td><td class="num">20.4</td><td class="num">6.2</td><td class="num">1,065.3</td><td class="num">40.5</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>Capped download</td><td class="num">3</td><td class="num">44.09<small class="cell-range">43.82–44.20</small></td><td class="num">23.2</td><td class="num">3.39</td><td class="num">22.1</td><td class="num">23.1</td><td class="num">9.0</td><td class="num">1,061.0</td><td class="num">44.5</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>Register 1,000 paused</td><td class="num">3</td><td class="num">0.43<small class="cell-range">0.43–0.45</small></td><td class="num">—</td><td class="num">0.23</td><td class="num">20.6</td><td class="num">25.1</td><td class="num">10.9</td><td class="num">22.3</td><td class="num">17.9</td></tr>
+<tr data-client="transmission"><th scope="row">Transmission</th><td>1,000 paused idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.00</small></td><td class="num">—</td><td class="num">0.09</td><td class="num">25.3</td><td class="num">25.6</td><td class="num">11.5</td><td class="num">22.1</td><td class="num">17.8</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>Empty idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.00</td><td class="num">13.0</td><td class="num">13.2</td><td class="num">1.8</td><td class="num">49.3</td><td class="num">49.0</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>4 GiB download</td><td class="num">3</td><td class="num">15.93<small class="cell-range">14.78–17.78</small></td><td class="num">257.2</td><td class="num">12.70</td><td class="num">1,257.6</td><td class="num">1,429.2</td><td class="num">3.6</td><td class="num">1,551.1</td><td class="num">1,417.0</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>4 GiB recheck</td><td class="num">3</td><td class="num">2.74<small class="cell-range">2.38–2.91</small></td><td class="num">1492.3</td><td class="num">2.73</td><td class="num">5.8</td><td class="num">7.9</td><td class="num">2.7</td><td class="num">1,536.0</td><td class="num">1,111.4</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>Two-peer upload</td><td class="num">3</td><td class="num">85.34<small class="cell-range">84.93–88.17</small></td><td class="num">96.0</td><td class="num">10.75</td><td class="num">6.8</td><td class="num">7.6</td><td class="num">3.0</td><td class="num">1,536.0</td><td class="num">1,522.5</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>2,048 files</td><td class="num">3</td><td class="num">3.98<small class="cell-range">3.32–4.18</small></td><td class="num">257.4</td><td class="num">2.75</td><td class="num">27.3</td><td class="num">953.7</td><td class="num">6.6</td><td class="num">1,098.0</td><td class="num">1,097.0</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>64 torrents</td><td class="num">3</td><td class="num">15.31<small class="cell-range">2.59–27.69</small></td><td class="num">66.9</td><td class="num">2.62</td><td class="num">17.6</td><td class="num">252.8</td><td class="num">6.5</td><td class="num">1,063.0</td><td class="num">1,062.2</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>64 seeds idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.01</td><td class="num">17.5</td><td class="num">17.6</td><td class="num">5.4</td><td class="num">1,062.9</td><td class="num">1,062.2</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>Capped download</td><td class="num">3</td><td class="num">33.38<small class="cell-range">33.36–33.76</small></td><td class="num">30.7</td><td class="num">3.50</td><td class="num">453.0</td><td class="num">994.1</td><td class="num">2.8</td><td class="num">1,060.2</td><td class="num">1,060.2</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>Register 1,000 paused</td><td class="num">3</td><td class="num">0.91<small class="cell-range">0.91–1.28</small></td><td class="num">—</td><td class="num">0.98</td><td class="num">24.6</td><td class="num">30.8</td><td class="num">18.7</td><td class="num">41.8</td><td class="num">25.5</td></tr>
+<tr data-client="rtorrent"><th scope="row">rTorrent</th><td>1,000 paused idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.00</small></td><td class="num">—</td><td class="num">0.02</td><td class="num">30.8</td><td class="num">30.8</td><td class="num">18.7</td><td class="num">41.8</td><td class="num">25.5</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>Empty idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.00</small></td><td class="num">—</td><td class="num">0.00</td><td class="num">9.6</td><td class="num">9.6</td><td class="num">1.1</td><td class="num">24.2</td><td class="num">24.0</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>4 GiB download</td><td class="num">3</td><td class="num">11.62<small class="cell-range">11.42–12.15</small></td><td class="num">352.4</td><td class="num">16.92</td><td class="num">13.5</td><td class="num">13.7</td><td class="num">2.3</td><td class="num">1,536.1</td><td class="num">75.5</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>4 GiB recheck</td><td class="num">3</td><td class="num">2.49<small class="cell-range">2.48–2.57</small></td><td class="num">1647.3</td><td class="num">2.33</td><td class="num">11.7</td><td class="num">13.3</td><td class="num">1.9</td><td class="num">914.5</td><td class="num">34.0</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>Two-peer upload</td><td class="num">3</td><td class="num">20.99<small class="cell-range">20.71–24.88</small></td><td class="num">390.3</td><td class="num">19.75</td><td class="num">12.3</td><td class="num">12.7</td><td class="num">2.4</td><td class="num">1,536.0</td><td class="num">177.5</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>2,048 files</td><td class="num">3</td><td class="num">2.93<small class="cell-range">2.91–3.21</small></td><td class="num">349.4</td><td class="num">3.74</td><td class="num">14.3</td><td class="num">16.3</td><td class="num">5.0</td><td class="num">1,069.0</td><td class="num">44.4</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>64 torrents</td><td class="num">3</td><td class="num">2.50<small class="cell-range">1.99–3.75</small></td><td class="num">410.3</td><td class="num">3.41</td><td class="num">18.5</td><td class="num">23.7</td><td class="num">12.3</td><td class="num">1,062.8</td><td class="num">87.2</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>64 seeds idle</td><td class="num">3</td><td class="num">15.00<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.67</td><td class="num">16.7</td><td class="num">17.0</td><td class="num">5.7</td><td class="num">1,063.0</td><td class="num">38.7</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>Capped download</td><td class="num">3</td><td class="num">32.49<small class="cell-range">32.44–32.68</small></td><td class="num">31.5</td><td class="num">4.66</td><td class="num">13.3</td><td class="num">13.4</td><td class="num">2.1</td><td class="num">1,058.2</td><td class="num">34.3</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>Register 1,000 paused</td><td class="num">3</td><td class="num">1.40<small class="cell-range">1.39–1.41</small></td><td class="num">—</td><td class="num">1.12</td><td class="num">15.3</td><td class="num">17.1</td><td class="num">5.9</td><td class="num">14.9</td><td class="num">10.7</td></tr>
+<tr data-client="rqbit"><th scope="row">rqbit</th><td>1,000 paused idle</td><td class="num">3</td><td class="num">15.01<small class="cell-range">15.00–15.01</small></td><td class="num">—</td><td class="num">0.02</td><td class="num">17.1</td><td class="num">17.1</td><td class="num">5.9</td><td class="num">14.6</td><td class="num">10.4</td></tr></tbody></table></div>
+<p class="measurement-key">RSS sums process resident pages, including file mappings and shared pages. Anonymous memory measures resident application allocations. Container memory includes charged filesystem cache. Working set is usage minus inactive file pages. Peaks are sampled; these counters are not interchangeable. Scroll the table horizontally on smaller screens.</p>
+<h3>Valid active-window diagnostics</h3><p>Active rates use the first progress samples at or above 10% and 90% of payload. Rates are MiB/s; first-payload times are seconds. A dash indicates a suppressed diagnostic because the API progress counter reset during initialization or checking. In particular, rTorrent's capped-download diagnostic was suppressed; its overall capped rate remains valid.</p><div class="table-scroll" role="region" tabindex="0" aria-label="Valid active-window rates and first observed payload times"><table><caption class="sr-only">Valid active-window rates and first observed payload times</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">Large active rate</th>
+<th scope="col" class="num">Large first payload, s</th>
+<th scope="col" class="num">Upload active rate</th>
+<th scope="col" class="num">Upload first payload, s</th>
+<th scope="col" class="num">Capped active rate</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qbittorrent</th>
+<td class="num">484.2</td>
+<td class="num">1.2</td>
+<td class="num">400.6</td>
+<td class="num">0.3</td>
+<td class="num">31.9</td>
+</tr>
+<tr>
+<th scope="row">deluge</th>
+<td class="num">227.2</td>
+<td class="num">4.9</td>
+<td class="num">343.5</td>
+<td class="num">0.2</td>
+<td class="num">32.0</td>
+</tr>
+<tr>
+<th scope="row">transmission</th>
+<td class="num">124.6</td>
+<td class="num">11.2</td>
+<td class="num">367.3</td>
+<td class="num">10.4</td>
+<td class="num">31.8</td>
+</tr>
+<tr>
+<th scope="row">rtorrent</th>
+<td class="num">—</td>
+<td class="num">—</td>
+<td class="num">337.5</td>
+<td class="num">60.8</td>
+<td class="num">—</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num">—</td>
+<td class="num">—</td>
+<td class="num">406.1</td>
+<td class="num">0.3</td>
+<td class="num">31.8</td>
+</tr>
+</tbody></table></div></section>
+<section id="evidence" aria-labelledby="heading-evidence"><div class="section-heading"><span class="section-number">07</span><h2 id="heading-evidence">Evidence &amp; source files</h2></div><p>This page contains the complete narrative report and the 50 measured workload groups. Its charts use embedded measurements and work directly from disk, without a server or internet connection. The linked files retain the underlying precision and resource time series.</p>
+<div class="resource-links"><a href="REPORT.md">Narrative source</a><a href="results/comparison/summary.csv">Summary CSV</a><a href="results/comparison/trials.json">All trial records</a><a href="results/comparison/samples.jsonl.gz">Resource time series</a><a href="results/comparison/environment.json">Recorded environment</a><a href="results/comparison/validation.json">Validation audit</a><a href="results/comparison/selection.json">Run selection</a><a href="results/runs/baseline/post-failure-diagnostic.json">Post-failure diagnostic</a><a href="compose.yaml">Docker Compose</a><a href="images.env">Pinned images</a><a href="README.md">Setup &amp; methodology</a></div>
+<h3>Upstream release references</h3><div class="source-list"><a href="https://www.qbittorrent.org/download">qBittorrent</a><a href="https://pypi.org/project/deluge/2.2.0/">Deluge 2.2.0</a><a href="https://github.com/transmission/transmission/releases/tag/4.1.4">Transmission 4.1.4</a><a href="https://github.com/rakshasa/rtorrent/releases/tag/v0.16.27">rTorrent 0.16.27</a><a href="https://github.com/ikatson/rqbit/releases/tag/v9.1.0">rqbit 9.1.0</a></div><p class="resources-note">Versions were resolved for the measured run on 2026-11-02. This page reports that pinned run; it does not check for newer releases when opened.</p></section>
+</main></div>
+<footer><span>225 GiB of synthetic transfers · Three repetitions · Measured 2026-11-02</span><a href="#">Back to top ↑</a></footer>
+<script type="application/json" id="chart-data">[{"client":"qbittorrent","workload":"download-large","median_mib_s":"399.1277134760755","min_mib_s":"350.3733412847003","max_mib_s":"402.49102556517465"},{"client":"qbittorrent","workload":"upload-2-peers","median_mib_s":"367.3781237205609","min_mib_s":"357.73389317021326","max_mib_s":"411.70508306406026"},{"client":"qbittorrent","workload":"download-files","median_mib_s":"250.304080225226","min_mib_s":"237.86647236045465","max_mib_s":"359.9789688754847"},{"client":"qbittorrent","workload":"download-concurrent","median_mib_s":"179.51137657879812","min_mib_s":"99.55869800140687","max_mib_s":"247.36476392554502"},{"client":"qbittorrent","workload":"download-shaped","median_mib_s":"29.876258229491008","min_mib_s":"29.800583336954876","max_mib_s":"29.903854712634057"},{"client":"deluge","workload":"download-large","median_mib_s":"171.08874668949332","min_mib_s":"165.29242418752702","max_mib_s":"179.5319633580472"},{"client":"deluge","workload":"upload-2-peers","median_mib_s":"337.1001176873949","min_mib_s":"295.2539378725373","max_mib_s":"374.83930926621593"},{"client":"deluge","workload":"download-files","median_mib_s":"96.45662940622556","min_mib_s":"93.17867665309574","max_mib_s":"98.03373857861516"},{"client":"deluge","workload":"download-concurrent","median_mib_s":"61.79869302711798","min_mib_s":"39.37330513164574","max_mib_s":"64.79977038140791"},{"client":"deluge","workload":"download-shaped","median_mib_s":"26.02481494376377","min_mib_s":"26.02467982226656","max_mib_s":"26.04431345207851"},{"client":"transmission","workload":"download-large","median_mib_s":"91.18406257987263","min_mib_s":"90.52176239366105","max_mib_s":"91.60201364805417"},{"client":"transmission","workload":"upload-2-peers","median_mib_s":"242.63412444583793","min_mib_s":"238.89754662518428","max_mib_s":"243.03684225251536"},{"client":"transmission","workload":"download-files","median_mib_s":"50.816161581915864","min_mib_s":"50.300527308661955","max_mib_s":"51.71294890567015"},{"client":"transmission","workload":"download-concurrent","median_mib_s":"47.05802415934065","min_mib_s":"19.75748307639689","max_mib_s":"72.92517329718387"},{"client":"transmission","workload":"download-shaped","median_mib_s":"23.224119225496615","min_mib_s":"23.166250043042655","max_mib_s":"23.36838983731557"},{"client":"rtorrent","workload":"download-large","median_mib_s":"257.187504244176","min_mib_s":"230.37431910772645","max_mib_s":"277.10373077027276"},{"client":"rtorrent","workload":"upload-2-peers","median_mib_s":"95.98944753769479","min_mib_s":"92.90684633333788","max_mib_s":"96.45464036441268"},{"client":"rtorrent","workload":"download-files","median_mib_s":"257.3986559052656","min_mib_s":"245.02589014263404","max_mib_s":"308.8640745105372"},{"client":"rtorrent","workload":"download-concurrent","median_mib_s":"66.87341531254661","min_mib_s":"36.98644486595889","max_mib_s":"395.15538448985035"},{"client":"rtorrent","workload":"download-shaped","median_mib_s":"30.67941464782738","min_mib_s":"30.327756852928207","max_mib_s":"30.691792464442997"},{"client":"rqbit","workload":"download-large","median_mib_s":"352.438141377787","min_mib_s":"337.13555536994136","max_mib_s":"358.75770405958923"},{"client":"rqbit","workload":"upload-2-peers","median_mib_s":"390.3372361592726","min_mib_s":"329.2041089813569","max_mib_s":"395.49694780053363"},{"client":"rqbit","workload":"download-files","median_mib_s":"349.4396586459003","min_mib_s":"318.97449689274424","max_mib_s":"351.6994497619063"},{"client":"rqbit","workload":"download-concurrent","median_mib_s":"410.3268733757035","min_mib_s":"273.1218887079167","max_mib_s":"515.6082045598772"},{"client":"rqbit","workload":"download-shaped","median_mib_s":"31.513385105686243","min_mib_s":"31.333309012137477","max_mib_s":"31.569779404852255"}]</script>
+<script>
+(() => {
+  'use strict';
+  const names = {qbittorrent:'qBittorrent',deluge:'Deluge',transmission:'Transmission',rtorrent:'rTorrent',rqbit:'rqbit'};
+  const data = JSON.parse(document.getElementById('chart-data').textContent);
+  const selector = document.getElementById('workload');
+  document.getElementById('chart-control').hidden = false;
+  selector.addEventListener('change', () => {
+    const rows = data.filter(row => row.workload === selector.value);
+    const ceiling = Math.max(...rows.map(row => Number(row.max_mib_s)));
+    const best = Math.max(...rows.map(row => Number(row.median_mib_s)));
+    const bars = document.getElementById('chart-bars');
+    const fragment = document.createDocumentFragment();
+    rows.forEach(row => {
+      const median = Number(row.median_mib_s), low = Number(row.min_mib_s), high = Number(row.max_mib_s);
+      const bar = document.createElement('div');
+      bar.className = 'bar-row';
+      const name = document.createElement('span');
+      name.className = 'bar-name';
+      name.textContent = names[row.client];
+      const track = document.createElement('div');
+      track.className = 'bar-track';
+      track.setAttribute('aria-hidden','true');
+      const fill = document.createElement('span');
+      fill.className = 'bar-fill' + (median === best ? ' best' : '');
+      fill.style.width = (median / ceiling * 100) + '%';
+      const range = document.createElement('span');
+      range.className = 'bar-range';
+      range.style.left = (low / ceiling * 100) + '%';
+      range.style.width = ((high - low) / ceiling * 100) + '%';
+      track.append(fill, range);
+      const number = document.createElement('span');
+      number.className = 'bar-number';
+      const value = document.createElement('strong');
+      value.textContent = median.toFixed(1);
+      const bounds = document.createElement('small');
+      bounds.textContent = low.toFixed(1) + '–' + high.toFixed(1);
+      number.append(value, bounds);
+      bar.append(name, track, number);
+      fragment.append(bar);
+    });
+    bars.replaceChildren(fragment);
+    document.getElementById('chart-title').textContent = selector.selectedOptions[0].textContent;
+  });
+  const filter = document.getElementById('client-filter');
+  const measurements = [...document.querySelectorAll('#measurements tbody tr')];
+  document.getElementById('measurement-control').hidden = false;
+  filter.addEventListener('change', () => {
+    measurements.forEach(row => { row.hidden = filter.value !== 'all' && row.dataset.client !== filter.value; });
+    document.getElementById('row-count').textContent = measurements.filter(row => !row.hidden).length + ' of 50 groups';
+  });
+})();
+</script>
+</body>
+</html>

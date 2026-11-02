@@ -1,0 +1,5 @@
+{
+  "version": "0.16.27",
+  "library": "0.16.27",
+  "configuration": "system.daemon.set = true\nnetwork.scgi.open_port = 0.0.0.0:5000\nnetwork.listen.port.range.set = 6881-6881\nnetwork.listen.port.random.set = no\ndirectory.default.set = /downloads\nsession.path.set = /config/session\ndht.mode.set = disable\nprotocol.pex.set = no\ntrackers.use_udp.set = no\nthrottle.max_peers.normal.set = 100\nthrottle.max_peers.seed.set = 100\nthrottle.max_uploads.set = 100\n"
+}

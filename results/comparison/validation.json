@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "phases": 150,
+  "download_phases": 60,
+  "upload_phases": 15,
+  "independent_leecher_completions": 30,
+  "observed_rechecks": 15,
+  "sha256_checked_files": 31710,
+  "download_gib": 105.0,
+  "upload_gib": 120.0,
+  "payload_gib": 225.0,
+  "resource_samples": 4908,
+  "transfer_evidence": "Every download RX and upload TX exceeds its full payload; every leecher received a complete payload and uploaded zero bytes."
+}

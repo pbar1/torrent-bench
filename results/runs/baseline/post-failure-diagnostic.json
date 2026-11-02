@@ -1,0 +1,13 @@
+{
+  "context": "Diagnostic performed after the baseline interruption and before resetting qBittorrent's destination. This is a transcription of the observed diagnostic, not an accepted timing trial.",
+  "initial_error": "/clients/qbittorrent/data/files/dir-000/file-0013.bin failed immediate SHA-256 verification",
+  "client_exit_code": 0,
+  "oom_killed": false,
+  "after_clean_shutdown": {
+    "fixture_group": "files",
+    "files_checked_against_manifest": 2048,
+    "persistent_sha256_mismatches": 0
+  },
+  "interpretation": "Consistent with deferred write/completion visibility. No persistent corruption was observed; the exact cause was not established.",
+  "selection": "Every qBittorrent baseline phase was excluded and all three repetitions were rerun with stricter completion and recheck monitoring."
+}

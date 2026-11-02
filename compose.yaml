@@ -1,0 +1,120 @@
+name: torrent-bench
+
+x-client: &client
+  networks: [lab]
+  cpus: 2
+  mem_limit: 1536m
+  memswap_limit: 1536m
+  stop_grace_period: 2m
+  environment:
+    PUID: 1000
+    PGID: 1000
+    TZ: UTC
+  ulimits:
+    nofile: {soft: 65536, hard: 65536}
+
+services:
+  qbittorrent:
+    <<: *client
+    image: ${QBITTORRENT_IMAGE:?use --env-file images.env}
+    environment:
+      QBT_LEGAL_NOTICE: confirm
+      QBT_WEBUI_PORT: 8080
+      QBT_TORRENTING_PORT: 6881
+      PUID: 1000
+      PGID: 1000
+    volumes: [qconfig:/config, qdata:/downloads]
+  deluge:
+    <<: *client
+    image: ${DELUGE_IMAGE:?}
+    volumes: [dconfig:/config, ddata:/downloads]
+  transmission:
+    <<: *client
+    image: ${TRANSMISSION_IMAGE:?}
+    cap_add: [NET_ADMIN]
+    volumes:
+      - tconfig:/config
+      - tdata:/downloads
+      - ./bench/transmission-init.sh:/custom-cont-init.d/10-lab-route:ro
+  rtorrent:
+    <<: *client
+    build: ./rtorrent
+    image: torrent-bench-rtorrent:0.16.27
+    user: '1000:1000'
+    command: [rtorrent, -n, -o, import=/config/rtorrent.rc]
+    volumes: [rconfig:/config, rdata:/downloads, fixtures:/fixtures:ro]
+  rqbit:
+    <<: *client
+    image: ${RQBIT_IMAGE:?}
+    environment:
+      XDG_CONFIG_HOME: /config
+      XDG_CACHE_HOME: /config
+    command: [--disable-dht, --disable-lsd, --disable-upnp-port-forward, --ipv4-only,
+              --listen-port, '6881', --http-api-listen-addr, '0.0.0.0:3030',
+              -v, warn, server, start, --persistence-location, /config/db, /downloads]
+    volumes: [rqconfig:/config, rqdata:/downloads]
+  peer1: &peer
+    image: ${DELUGE_IMAGE:?}
+    entrypoint: [/lsiopy/bin/python3, /bench/swarm.py]
+    networks: [lab]
+    cpus: 2
+    mem_limit: 1536m
+    memswap_limit: 1536m
+    volumes: [./bench:/bench:ro, fixtures:/fixtures:ro, peer1data:/scratch]
+  peer2:
+    <<: *peer
+    volumes: [./bench:/bench:ro, fixtures:/fixtures:ro, peer2data:/scratch]
+  leech1:
+    <<: *peer
+    volumes: [./bench:/bench:ro, fixtures:/fixtures:ro, leech1data:/scratch]
+  leech2:
+    <<: *peer
+    volumes: [./bench:/bench:ro, fixtures:/fixtures:ro, leech2data:/scratch]
+  tracker:
+    image: ${PYTHON_IMAGE:?}
+    command: [python, -u, /bench/tracker.py]
+    networks: [lab]
+    volumes: [./bench:/bench:ro, fixtures:/fixtures:ro]
+  bench:
+    image: ${PYTHON_IMAGE:?}
+    profiles: [tools]
+    command: [python, -u, /bench/run.py]
+    networks: [lab]
+    environment:
+      NO_PROXY: '*'
+      PYTHONPATH: /bench
+    volumes:
+      - ./bench:/bench:ro
+      - ./results:/results
+      - fixtures:/fixtures
+      - qconfig:/clients/qbittorrent/config
+      - qdata:/clients/qbittorrent/data
+      - dconfig:/clients/deluge/config
+      - ddata:/clients/deluge/data
+      - tconfig:/clients/transmission/config
+      - tdata:/clients/transmission/data
+      - rconfig:/clients/rtorrent/config
+      - rdata:/clients/rtorrent/data
+      - rqconfig:/clients/rqbit/config
+      - rqdata:/clients/rqbit/data
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock
+
+networks:
+  lab:
+    internal: true
+volumes:
+  fixtures:
+  qconfig:
+  qdata:
+  dconfig:
+  ddata:
+  tconfig:
+  tdata:
+  rconfig:
+  rdata:
+  rqconfig:
+  rqdata:
+  peer1data:
+  peer2data:
+  leech1data:
+  leech2data:

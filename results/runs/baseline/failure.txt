@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/bench/run.py", line 415, in run
+    except BaseException:
+                        ^^
+  File "/bench/run.py", line 316, in download
+    trial['verification'] = verify(torrents, name)
+                            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/bench/run.py", line 123, in verify
+    raise AssertionError(f'Independent SHA-256 verification failed: {path}')
+AssertionError: Independent SHA-256 verification failed: /clients/qbittorrent/data/files/dir-000/file-0013.bin
