@@ -1,0 +1,9 @@
+{
+  "torrent_url": "https://releases.ubuntu.com/26.04/ubuntu-26.04.1-live-server-amd64.iso.torrent",
+  "checksums_url": "https://releases.ubuntu.com/26.04/SHA256SUMS",
+  "torrent_sha256": "6487c84e88f05ac802d72251213ec0e619df1c806c0303c4fa6e8780251b8640",
+  "iso_sha256": "cc8a95cde20f6ced61a322420de00f10cc3c90ced545daa46cb9c1a117f1d927",
+  "info_hash": "e4f19cf636409b72571766c2ae89c98fc21a109d",
+  "payload_bytes": 2927861760,
+  "web_seeds": []
+}

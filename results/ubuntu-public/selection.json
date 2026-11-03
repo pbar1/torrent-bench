@@ -1,0 +1,32 @@
+[
+  {
+    "client": "qbittorrent",
+    "repeat": 0,
+    "source": "results/runs/ubuntu-first-half"
+  },
+  {
+    "client": "deluge",
+    "repeat": 0,
+    "source": "results/runs/ubuntu-first-half"
+  },
+  {
+    "client": "transmission",
+    "repeat": 0,
+    "source": "results/runs/ubuntu-first-half"
+  },
+  {
+    "client": "rtorrent",
+    "repeat": 0,
+    "source": "results/runs/ubuntu-second-half"
+  },
+  {
+    "client": "rqbit",
+    "repeat": 0,
+    "source": "results/runs/ubuntu-second-half"
+  },
+  {
+    "client": "aria2",
+    "repeat": 0,
+    "source": "results/runs/ubuntu-second-half"
+  }
+]

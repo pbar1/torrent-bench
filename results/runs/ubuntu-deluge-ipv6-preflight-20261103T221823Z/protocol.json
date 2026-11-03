@@ -1,0 +1,34 @@
+{
+  "schema": 2,
+  "registered_utc": "2026-11-03T22:18:24.441324+00:00",
+  "repeats": 1,
+  "orders": [
+    [
+      "deluge"
+    ]
+  ],
+  "order_seed": 20261103,
+  "deadline_s": 900,
+  "early_no_progress_cutoff_s": null,
+  "timer": "API submission through client completion; daemon startup excluded",
+  "state": "Fresh daemon, configuration, DHT routing table, and destination for every attempt",
+  "network": "Dual-stack outgoing Docker network; no forwarded incoming ports",
+  "limits": {
+    "cpu_cores": 2,
+    "charged_memory_mib": 1536,
+    "swap": false
+  },
+  "primary_outcomes": [
+    "Completion within deadline, including all assigned attempts",
+    "Completion time and complete-file MiB/s, conditional on verified completion"
+  ],
+  "secondary_outcomes": [
+    "First payload and 10-90% rate where progress is unambiguous",
+    "CPU core-seconds, sampled RSS/anonymous/charged/working memory peaks",
+    "Payload progress on failure, network receive/transmit bytes"
+  ],
+  "analysis": "Per-attempt points, median, IQR, range; completion Wilson 95% interval; deadline-penalized completion time includes failures; no fastest-run selection",
+  "stopping_rule": "Execute every registered slot once. Retain errors/timeouts; do not replace slow or failed valid attempts.",
+  "environment_exclusions": "Any observed Ethernet outage/route change or instrumentation failure invalidates affected measurements; retain evidence and disclose reruns.",
+  "payload_retention": "Independent SHA-256 verification, then delete ISO/sidecars before next slot"
+}

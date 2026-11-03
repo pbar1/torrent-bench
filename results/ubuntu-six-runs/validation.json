@@ -1,0 +1,94 @@
+{
+  "ok": true,
+  "trials": 36,
+  "completed_downloads": 30,
+  "all_downloads_completed": false,
+  "independent_sha256_checks": 30,
+  "verified_payload_bytes": 87835852800,
+  "resource_samples": 14238,
+  "iso_retained": false,
+  "cleanups_with_empty_scratch": 36,
+  "input_sha256": {
+    "trials.json": "6456007a7d7f9e34add6ebd399cd2ef357ab1376cf12ca3fb7ac00839b7a60d4",
+    "samples.jsonl.gz": "465df6c46a893e2202f43366aee46851c4524b875a92108b012108c763c65cfc",
+    "torrent-source.json": "8052a7436f0843ceeb8857f52e5bed5d76a7eb9e838f51491783ce5c0bdab84f",
+    "protocol.json": "005573e55b0bffeb69271034d3eb95bfbf9f93cdc8fc7b9f20f55dd6a8076a0e",
+    "environment.json": "8006c40c10d7fa5991ccc0c8042516f1944dedeaac5a1eea292a17aed766f054",
+    "host-link.jsonl": "ff35852f9f8f8920fe751569046a798c52b4144a9ab22f4b67255707c3eb89a7",
+    "observations.json": "0e8e22963e80a6412a74973d2da453b4a458219778103d9777648264be0412a7",
+    "followup-plan.json": "2d43874a2edfc015e1571e78436f4e2e048f3d2c1402471d536edf3f4bf35ed2",
+    "followup-decision.json": "1111871835ca5e017dd341f65c39eb5ad82a97a47eb5e1c13ead7ec5bbb8b9c1"
+  },
+  "registered_orders_matched": true,
+  "ordering_design": "Six-client Williams; positions and within-round directed pairs balanced",
+  "balanced_positions": 36,
+  "balanced_within_round_directed_pairs": 30,
+  "archived_harness_files_verified": 17,
+  "per_trial_settings_verified": 36,
+  "dual_stack_network": true,
+  "host_link_observations": 920,
+  "host_link_all_ok": true,
+  "max_host_observation_gap_s": 10.119662,
+  "resource_aggregates_recomputed": 36,
+  "no_optional_diagnostic_rpc_errors": true,
+  "max_resource_sample_gap_s": 15.242269674000454,
+  "sampling_interval_s_by_client": {
+    "aria2": {
+      "n": 2761,
+      "median": 0.5278431249998903,
+      "q1": 0.5249309589999029,
+      "q3": 0.5318644999988464,
+      "min": 0.09439595900039421,
+      "max": 0.565041249999922,
+      "mean": 0.5271797673230719
+    },
+    "rqbit": {
+      "n": 202,
+      "median": 1.0625490219999847,
+      "q1": 0.5296026875003008,
+      "q3": 4.396403856750794,
+      "min": 0.018913124999926367,
+      "max": 13.77847004799878,
+      "mean": 2.393340349069311
+    },
+    "transmission": {
+      "n": 2956,
+      "median": 0.5282571669995377,
+      "q1": 0.5242437917503366,
+      "q3": 0.531371177249639,
+      "min": 0.1573872079989087,
+      "max": 15.242269674000454,
+      "mean": 0.6552475993190118
+    },
+    "deluge": {
+      "n": 7238,
+      "median": 0.5297311670001363,
+      "q1": 0.5267757507494935,
+      "q3": 0.5334932604996538,
+      "min": 0.012837375000344764,
+      "max": 4.39770691800004,
+      "mean": 0.5658465585841392
+    },
+    "rtorrent": {
+      "n": 726,
+      "median": 0.5246526464993622,
+      "q1": 0.5195050727506896,
+      "q3": 0.5301006139995934,
+      "min": 0.1761840420003864,
+      "max": 0.5590178749998813,
+      "mean": 0.523726191987604
+    },
+    "qbittorrent": {
+      "n": 319,
+      "median": 1.1227556249996269,
+      "q1": 0.5205591045000801,
+      "q3": 2.878127375999611,
+      "min": 0.03973212499931833,
+      "max": 5.766208086000006,
+      "mean": 1.7234501247398055
+    }
+  },
+  "experiment_utc_start": "2026-11-03T19:36:00.587622+00:00",
+  "experiment_utc_end": "2026-11-03T22:08:00.936467+00:00",
+  "analysis_sha256": "f304a32197e93f061b5f0bd0c3376081ad174eff9a3ce397e7d9451942240750"
+}

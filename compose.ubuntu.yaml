@@ -1,0 +1,50 @@
+# Opt-in public-swarm extension. The default synthetic Compose file stays isolated.
+name: torrent-bench-ubuntu
+
+x-public-client: &public
+  networks:
+    lab: {}
+    internet: {gw_priority: 1}
+  volumes: [scratch:/downloads]
+
+services:
+  qbittorrent: *public
+  deluge: *public
+  transmission: *public
+  rtorrent:
+    <<: *public
+    volumes: [scratch:/downloads, ./ubuntu:/fixtures:ro]
+  rqbit:
+    <<: *public
+    command: [--disable-lsd, --disable-upnp-port-forward,
+              --listen-port, '6881', --http-api-listen-addr, '0.0.0.0:3030',
+              -v, warn, server, start, --persistence-location, /config/db, /downloads]
+  aria2:
+    <<: *public
+    command: [--no-conf=true, --enable-rpc=true, --rpc-listen-all=true,
+              --rpc-listen-port=6800, --rpc-save-upload-metadata=false,
+              --dir=/downloads, --enable-dht=true, --enable-dht6=false,
+              --dht-entry-point=dht.transmissionbt.com:6881,
+              --dht-file-path=/config/dht.dat,
+              --enable-peer-exchange=true, --bt-enable-lpd=false,
+              --disable-ipv6=false, --listen-port=6881, --bt-max-peers=100,
+              --max-concurrent-downloads=2000, --max-download-result=2000,
+              --seed-ratio=0.0, --max-upload-limit=0, --max-overall-upload-limit=0,
+              --console-log-level=warn, --summary-interval=0]
+  bench:
+    volumes:
+      - ./ubuntu:/fixtures:ro
+      - scratch:/clients/qbittorrent/data
+      - scratch:/clients/deluge/data
+      - scratch:/clients/transmission/data
+      - scratch:/clients/rtorrent/data
+      - scratch:/clients/rqbit/data
+      - scratch:/clients/aria2/data
+
+networks:
+  internet:
+    internal: false
+    enable_ipv6: true
+
+volumes:
+  scratch:

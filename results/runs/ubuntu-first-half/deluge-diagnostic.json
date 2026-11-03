@@ -1,0 +1,21 @@
+{
+  "utc": "2026-11-03T18:59:33.429493+00:00",
+  "client": "deluge",
+  "repeat": 0,
+  "torrents": {
+    "e4f19cf636409b72571766c2ae89c98fc21a109d": {
+      "num_peers": 5,
+      "download_payload_rate": 21795024,
+      "tracker_status": "Announce OK",
+      "num_seeds": 74,
+      "total_done": 1338949632,
+      "state": "Downloading"
+    }
+  },
+  "session": {
+    "dht.dht_nodes": 272,
+    "peer.connection_attempts": 562,
+    "peer.num_tcp_peers": 45,
+    "peer.num_utp_peers": 52
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "status": "interrupted",
+  "reason": "Stopped during first Transmission attempt to complete DHT bootstrap configuration for rTorrent and aria2 before a fresh full pass.",
+  "completed_trial_records": 2,
+  "resource_samples_by_client": {
+    "qbittorrent": 100,
+    "deluge": 1151,
+    "transmission": 559
+  },
+  "scratch_volume_removed": true
+}

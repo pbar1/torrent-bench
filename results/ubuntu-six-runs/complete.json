@@ -1,0 +1,37 @@
+{
+  "ok": true,
+  "trials": 36,
+  "timeouts": [
+    {
+      "client": "deluge",
+      "repeat": 1,
+      "workload": "ubuntu-public"
+    },
+    {
+      "client": "aria2",
+      "repeat": 1,
+      "workload": "ubuntu-public"
+    },
+    {
+      "client": "transmission",
+      "repeat": 2,
+      "workload": "ubuntu-public"
+    },
+    {
+      "client": "deluge",
+      "repeat": 2,
+      "workload": "ubuntu-public"
+    },
+    {
+      "client": "deluge",
+      "repeat": 4,
+      "workload": "ubuntu-public"
+    },
+    {
+      "client": "deluge",
+      "repeat": 5,
+      "workload": "ubuntu-public"
+    }
+  ],
+  "scratch_empty": true
+}

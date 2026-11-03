@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Measured performance of qBittorrent, Deluge, Transmission, rTorrent, rqbit, and aria2: 180 phases, 270 GiB of synthetic transfers, CPU, memory, and reproducible Docker Compose methodology.">
+<meta name="description" content="Measured performance of qBittorrent, Deluge, Transmission, rTorrent, rqbit, and aria2: 180 synthetic phases, 36 main public Ubuntu attempts and six separate Deluge interface attempts, with repeated throughput, CPU, memory, and reproducible Docker Compose methodology.">
 <meta name="color-scheme" content="light">
 <title>Torrent client comparison — measured performance &amp; memory</title>
 <style>
@@ -12,19 +12,988 @@
 @media(max-width:700px){.topline,.navigation,.page,footer{padding-left:22px;padding-right:22px}.topline{padding-top:15px;padding-bottom:15px}.top-meta{display:none}.navigation{gap:22px}.hero{padding-top:35px}h1{font-size:2.65rem}.hero-subtitle{font-size:.97rem}.stats{grid-template-columns:repeat(2,1fr);gap:22px 0;margin-top:26px}.stat{padding-left:20px}.stat:nth-child(3){padding-left:0;border:0}.stat strong{font-size:1.85rem}.lab-line{font-size:.72rem}main section{padding:29px 0 31px}.section-heading{gap:12px}h2{font-size:1.35rem}section>p{font-size:.92rem;line-height:1.75}.chart{padding:20px 15px 16px}.chart-top{flex-direction:column;gap:14px}.chart-control{width:100%}.chart-control select{width:100%}.bar-row{grid-template-columns:90px 1fr 68px;gap:9px;padding:11px 0}.bar-name{font-size:.73rem}.bar-track{height:18px}.bar-number strong{font-size:.87rem}.bar-number small{font-size:.59rem}.chart figcaption{font-size:.66rem}.range-mark{margin-left:9px}.measurement-control{flex-wrap:wrap}th,td{padding:11px 13px}pre{padding:18px;font-size:.72rem}footer{flex-direction:column}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media print{@page{size:A4 landscape;margin:15mm}body{background:white;color:black;font-size:10pt}.topline,.navigation,.page,footer{max-width:none;padding-left:0;padding-right:0}.nav-shell,.chart-control,.measurement-control,.top-meta{display:none!important}.hero{padding-top:0}h1{font-size:30pt}h2{font-size:17pt}.hero-subtitle{font-size:11pt}section>p{max-width:none;font-size:10pt}main section{padding:22px 0}.stats{margin-top:20px}.table-scroll{overflow:visible;border-radius:0}table,.table-scroll table,.measurements table{min-width:0;font-size:8pt}.measurements table{font-size:6.7pt}th,td,.measurements th,.measurements td{padding:6px}.table-scroll,.chart{break-inside:avoid}.measurements{break-inside:auto}tr{break-inside:avoid}thead{display:table-header-group}.chart{padding:18px}.chart-top{margin-bottom:12px}.bar-row{padding:6px 0}.cell-range{font-size:6.5pt}pre{background:#eee;color:black}a{color:inherit}h2,h3{break-after:avoid}tr[hidden]{display:table-row!important}footer{font-size:8pt}.lab-line{font-size:8pt}}
+
+.public-row{display:grid;grid-template-columns:130px minmax(0,1fr) 95px;gap:18px;align-items:center;padding:10px 0}.public-track{position:relative;height:34px;background:#f0f4f6;border-radius:3px}.public-point{position:absolute;width:7px;height:7px;margin-left:-3px;border-radius:50%;background:#17618a;border:1px solid white;z-index:2}.public-point.incomplete{background:white;border-color:#a34b2e}.public-range{position:absolute;top:17px;height:1px;background:#81939d}.public-iqr{position:absolute;top:10px;height:15px;background:#c5dfd5}.public-median{position:absolute;top:5px;height:25px;width:2px;margin-left:-1px;background:#08795e;z-index:1}.public-description{font-size:.8rem;color:var(--muted);margin:0 0 16px}.public-axis{display:grid;grid-template-columns:130px minmax(0,1fr) 95px;gap:18px;font-size:.68rem;color:var(--muted)}.public-axis>span:nth-child(2)>span{float:right}.public-axis>span:last-child{text-align:right}
+@media(max-width:700px){.public-row,.public-axis{grid-template-columns:90px minmax(0,1fr) 68px;gap:9px}.public-chart .bar-name{font-size:.73rem}.public-chart .chart-control select{font-size:.73rem}}
 </style>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to findings</a>
-<header><div class="topline"><span class="brand"><span class="brand-icon" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h13m-4-4 4 4-4 4M17 14H4m4-4-4 4 4 4"/></svg></span>Torrent client benchmarks</span><span class="top-meta">Local data · Private swarm · Reproducible</span></div></header>
-<div class="nav-shell"><nav class="navigation" aria-label="Report sections"><a href="#overview">Overview</a><a href="#transfer-results">Throughput</a><a href="#memory-and-cpu">Memory &amp; CPU</a><a href="#versions-and-conditions">Test setup</a><a href="#validation-and-collection-history">Validation</a><a href="#all-measurements">All measurements</a></nav></div>
+<header><div class="topline"><span class="brand"><span class="brand-icon" aria-hidden="true"><svg width="19" height="19" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h13m-4-4 4 4-4 4M17 14H4m4-4-4 4 4 4"/></svg></span>Torrent client benchmarks</span><span class="top-meta">Synthetic lab · Ubuntu public swarm</span></div></header>
+<div class="nav-shell"><nav class="navigation" aria-label="Report sections"><a href="#overview">Overview</a><a href="#ubuntu-public-download">Ubuntu download</a><a href="#transfer-results">Synthetic throughput</a><a href="#memory-and-cpu">Memory &amp; CPU</a><a href="#versions-and-conditions">Test setup</a><a href="#validation-and-collection-history">Validation</a><a href="#all-measurements">All measurements</a></nav></div>
 <div class="page">
-<div class="hero"><p class="eyebrow">Synthetic BitTorrent benchmark / 02–03 November 2026</p><h1>Torrent client<br>performance comparison.</h1><p class="hero-subtitle">qBittorrent, Deluge, Transmission, rTorrent, rqbit, and aria2, exercised in a closed Docker lab. Real transfers. Generated data.</p>
-<div class="stats" aria-label="Benchmark totals"><div class="stat"><strong>180</strong><small>accepted test phases</small></div><div class="stat"><strong>270 <span>GiB</span></strong><small>payload transferred</small></div><div class="stat"><strong>3</strong><small>repetitions per client</small></div><div class="stat"><strong>38,052</strong><small>SHA-256 file checks</small></div></div>
-<p class="lab-line"><a class="verified" href="results/comparison/validation.json">Payload verification passed</a><span>Native ARM64</span><span>2 CPU cores / 1,536 MiB per client</span><span>No public torrents</span></p></div>
+<div class="hero"><p class="eyebrow">BitTorrent benchmarks / 02–03 November 2026</p><h1>Torrent client<br>performance comparison.</h1><p class="hero-subtitle">qBittorrent, Deluge, Transmission, rTorrent, rqbit, and aria2, measured in a controlled Docker lab and on the public Ubuntu swarm over gigabit Ethernet. Throughput, CPU, and memory.</p>
+<div class="stats" aria-label="Synthetic benchmark totals"><div class="stat"><strong>180</strong><small>synthetic test phases</small></div><div class="stat"><strong>270 <span>GiB</span></strong><small>synthetic payload transferred</small></div><div class="stat"><strong>3</strong><small>synthetic repetitions / client</small></div><div class="stat"><strong>38,052</strong><small>synthetic SHA-256 file checks</small></div></div>
+<p class="lab-line"><a class="verified" href="results/comparison/validation.json">Payload verification passed</a><span>Native ARM64</span><span>2 CPU cores / 1,536 MiB per client</span><span>Main public test: 36 attempts, six per client</span><span>Deluge interface follow-up: six attempts</span><span>1 GbE confirmed</span></p></div>
 <main id="main"><section id="overview" aria-labelledby="heading-overview"><div class="section-heading"><span class="section-number">00</span><h2 id="heading-overview">Findings at a glance</h2></div><p>Measured on <strong>2026-11-02</strong>, with aria2 added on <strong>2026-11-03</strong>. rqbit offered the strongest combination of throughput and small application memory in this lab. qBittorrent had the fastest median large-file download. Transmission used little application memory but completed downloads more slowly. rTorrent used very little anonymous memory, with large file mappings and a repeatable upload startup delay. Deluge had the largest application memory footprint and highest CPU cost for the large download. aria2 offered another small application footprint, with moderate bulk-transfer rates and the slowest cached recheck in this suite.</p>
-<p>These findings come from actual BitTorrent transfers: <strong>180 accepted phases, three repetitions per client, 270 GiB of payload</strong>. All data and torrent metadata were generated locally. The Compose runtime network was internal, with no public torrents, internet trackers, magnets, or published ports.</p></section>
-<section id="versions-and-conditions" aria-labelledby="heading-versions-and-conditions"><div class="section-heading"><span class="section-number">01</span><h2 id="heading-versions-and-conditions">Versions and conditions</h2></div><div class="table-scroll" role="region" tabindex="0" aria-label="Versions and conditions"><table><caption class="sr-only">Versions and conditions</caption><thead><tr>
+<p>The synthetic findings come from actual BitTorrent transfers: <strong>180 accepted phases, three repetitions per client, 270 GiB of payload</strong>. All data and torrent metadata were generated locally. The Compose runtime network was internal, with no public torrents, internet trackers, magnets, or published ports.</p></section>
+<section id="ubuntu-public-download" aria-labelledby="heading-ubuntu-public-download"><div class="section-heading"><span class="section-number">01</span><h2 id="heading-ubuntu-public-download">Ubuntu public download</h2></div><p><strong>The main public experiment completed all 36 planned attempts: six fresh attempts for each of six clients. Thirty downloads finished within the 15-minute deadline and passed independent filesystem SHA-256 verification; six timed out.</strong> It ran on 2026-11-03 from <strong>19:36:00 to 22:08:00 UTC</strong>. This is separate from the synthetic lab. The host used <strong>1000baseT full duplex</strong> Ethernet throughout: all 920 sanitized observations confirmed active gigabit media and primary IPv4/IPv6 routes through <code>en9</code>. This establishes the local link, not ISP capacity.</p>
+<p><strong>Main findings.</strong> rTorrent had the highest completed-download median, <strong>41.09 MiB/s</strong>, and completed 6/6. rqbit reached <strong>35.43 MiB/s</strong> and qBittorrent <strong>31.71 MiB/s</strong>, also 6/6. aria2 completed 5/6 at a conditional median of <strong>32.38 MiB/s</strong>, but its 9.65–84.99 MiB/s range and timeout show substantial variability. Transmission completed 5/6 at <strong>14.52 MiB/s</strong>; its timeout reached approximately 99.956% reported progress without completing. Deluge&#x27;s native empty-interface configuration completed only 2/6, at <strong>11.28 MiB/s</strong>. Its loaded-download estimate therefore has only two observations; the separately registered interface follow-up below addresses that limitation without replacing these failures.</p>
+<p>The source was the unmodified official <a href="https://releases.ubuntu.com/26.04/ubuntu-26.04.1-live-server-amd64.iso.torrent">Ubuntu 26.04.1 live server AMD64 torrent</a>: <strong>2,927,861,760 bytes, 2,792.23 MiB (2.73 GiB)</strong>, 256 KiB pieces, 11,169 pieces, two HTTPS tracker endpoints, and no web seeds. The <a href="ubuntu/source.json">torrent provenance</a> records the metadata and official checksum source. Each completed rate divides this fixed payload by elapsed time from API submission through reported completion, including discovery, initialization, transfer, and final-piece delays. Daemon startup and configuration happen before the timer; independent SHA-256 verification happens afterward with the client stopped. MiB/s means binary megabytes per second; multiply by 8.388608 for decimal Mb/s.</p>
+<p><strong>Design registered before measurement.</strong> A seeded six-round Williams design placed every client once in each execution position and every directed adjacent client pair once within rounds. Cross-round transitions are not included in that balance. The <a href="results/ubuntu-six-runs/protocol.json">protocol</a> fixes the complete order, six attempts per client, and a <strong>900-second deadline with no early no-progress cutoff</strong>. All slots were executed sequentially; no failed or slow attempt was replaced. Configuration, session/DHT state, and destination files were reset for every attempt. This is fresh application state; host/VM filesystem caches were not globally flushed. An already running, warmed-DHT client was not tested. A final piece arriving after the deadline would still count as a timeout here.</p>
+<p>The same six pinned versions and native ARM64 Docker environment as the synthetic suite were used, with <strong>2 CPU cores, 1,536 MiB charged memory, and no container swap</strong>. Seventeen Python harness files were archived and hash-checked; the measurement code stayed fixed throughout the main experiment. Effective settings were separately recorded and hashed for every attempt. DHT and PEX were enabled, LAN discovery and automatic port forwarding disabled, with native TCP/uTP support where available. Five clients used a 100-peer per-torrent limit; rqbit retained its native peer policy. Aria2 retained its default disabled IPv6 DHT while IPv6 peer transport was enabled. Those native engine differences are part of this deployable-image comparison.</p>
+<p>The public Docker network supported outgoing <strong>IPv4 and IPv6</strong>, with NAT and no forwarded incoming ports; control traffic used a separate internal network. No synthetic peers ran alongside the public experiment. Deluge&#x27;s empty native <code>listen_interface</code> preference resolves to <code>0.0.0.0</code> in <a href="https://github.com/deluge-torrent/deluge/blob/deluge-2.2.0/deluge/core/preferencesmanager.py#L205-L223">Deluge 2.2.0&#x27;s implementation</a>. An aggregate socket inspection during its second, failed attempt found IPv4 sockets and no IPv6 peer sockets. It changed no settings, but the brief Python helper may add a small amount of CPU/RSS to that failed attempt; the <a href="results/ubuntu-six-runs/observations.json">observation record</a> discloses it. Completed-download resource summaries exclude that attempt. No peer addresses or IDs were retained.</p>
+<p><strong>Statistics retain failures.</strong> Throughput medians, IQRs, and ranges are conditional on verified completion. A failure has no complete-file rate, rather than an invented zero rate. Completion counts show all attempts; a separate deadline-penalized mean assigns every failure the full 900 seconds. Thus the chart&#x27;s speed ranking and the penalized-time ranking answer different questions. A six-success sample still has a wide Wilson interval; these are descriptive results, with no significance test or universal capacity claim.</p>
+<p>Six registered attempts per client, 36 total; a fixed 900-second deadline, without an early stall cutoff. Median, interquartile range (IQR), and full range describe completed, SHA-256 verified downloads. Every failure remains in the completion count and receives 900 seconds in the penalized mean. Inclusive quartiles use linear interpolation at rank (n−1)×p. Speed and duration medians are computed separately from per-attempt values.</p>
+<figure class="chart public-chart" aria-labelledby="public-chart-title"><div class="chart-top"><div><h3 id="public-chart-title">Every observation in the main experiment</h3><p>Six registered attempts per client. Hover over a point for its round and value.</p></div><div class="chart-control" id="public-chart-control" hidden><label for="public-metric">Compare metric</label><select id="public-metric"><option value="mib_s">Complete-file throughput, MiB/s</option><option value="penalized_s">Deadline-penalized time, seconds</option><option value="peak_anon_mib">Peak anonymous memory, MiB</option><option value="peak_rss_mib">Peak RSS, MiB</option><option value="peak_memory_mib">Peak charged memory, MiB</option><option value="cpu_s">CPU cost, core-seconds</option></select></div></div><div class="public-panel" data-metric="mib_s"><p class="public-description"><strong>Complete-file throughput, MiB/s.</strong> Higher is faster; completed downloads only.</p><div class="public-row"><span class="bar-name">qBittorrent</span><div class="public-track"><span class="public-range" style="left:25.9102%;width:17.3042%"></span><span class="public-iqr" style="left:30.4542%;width:9.1757%"></span><span class="public-median" style="left:35.1997%"></span><span class="public-point" style="left:29.2829%;top:4px" role="img" aria-label="Round 1: 26.38; ok" title="Round 1: 26.38; ok"></span><span class="public-point" style="left:43.2144%;top:8px" role="img" aria-label="Round 2: 38.93; ok" title="Round 2: 38.93; ok"></span><span class="public-point" style="left:36.4316%;top:12px" role="img" aria-label="Round 3: 32.82; ok" title="Round 3: 32.82; ok"></span><span class="public-point" style="left:33.9678%;top:16px" role="img" aria-label="Round 4: 30.60; ok" title="Round 4: 30.60; ok"></span><span class="public-point" style="left:25.9102%;top:20px" role="img" aria-label="Round 5: 23.34; ok" title="Round 5: 23.34; ok"></span><span class="public-point" style="left:40.6959%;top:24px" role="img" aria-label="Round 6: 36.66; ok" title="Round 6: 36.66; ok"></span></div><span class="bar-number"><strong>31.7</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Deluge</span><div class="public-track"><span class="public-range" style="left:12.4368%;width:0.1746%"></span><span class="public-iqr" style="left:12.4804%;width:0.0873%"></span><span class="public-median" style="left:12.5241%"></span><span class="public-point" style="left:12.4368%;top:4px" role="img" aria-label="Round 1: 11.20; ok" title="Round 1: 11.20; ok"></span><span class="public-point" style="left:12.6113%;top:16px" role="img" aria-label="Round 4: 11.36; ok" title="Round 4: 11.36; ok"></span></div><span class="bar-number"><strong>11.3</strong><small>2 observations</small></span></div><div class="public-row"><span class="bar-name">Transmission</span><div class="public-track"><span class="public-range" style="left:8.9136%;width:18.3835%"></span><span class="public-iqr" style="left:15.4604%;width:1.5136%"></span><span class="public-median" style="left:16.1202%"></span><span class="public-point" style="left:15.4604%;top:4px" role="img" aria-label="Round 1: 13.93; ok" title="Round 1: 13.93; ok"></span><span class="public-point" style="left:16.9740%;top:8px" role="img" aria-label="Round 2: 15.29; ok" title="Round 2: 15.29; ok"></span><span class="public-point" style="left:27.2971%;top:16px" role="img" aria-label="Round 4: 24.59; ok" title="Round 4: 24.59; ok"></span><span class="public-point" style="left:8.9136%;top:20px" role="img" aria-label="Round 5: 8.03; ok" title="Round 5: 8.03; ok"></span><span class="public-point" style="left:16.1202%;top:24px" role="img" aria-label="Round 6: 14.52; ok" title="Round 6: 14.52; ok"></span></div><span class="bar-number"><strong>14.5</strong><small>5 observations</small></span></div><div class="public-row"><span class="bar-name">rTorrent</span><div class="public-track"><span class="public-range" style="left:42.3674%;width:23.0707%"></span><span class="public-iqr" style="left:42.5989%;width:15.7944%"></span><span class="public-median" style="left:45.6096%"></span><span class="public-point" style="left:65.4381%;top:4px" role="img" aria-label="Round 1: 58.95; ok" title="Round 1: 58.95; ok"></span><span class="public-point" style="left:42.6252%;top:8px" role="img" aria-label="Round 2: 38.40; ok" title="Round 2: 38.40; ok"></span><span class="public-point" style="left:42.5901%;top:12px" role="img" aria-label="Round 3: 38.37; ok" title="Round 3: 38.37; ok"></span><span class="public-point" style="left:48.5940%;top:16px" role="img" aria-label="Round 4: 43.78; ok" title="Round 4: 43.78; ok"></span><span class="public-point" style="left:42.3674%;top:20px" role="img" aria-label="Round 5: 38.17; ok" title="Round 5: 38.17; ok"></span><span class="public-point" style="left:61.6597%;top:24px" role="img" aria-label="Round 6: 55.55; ok" title="Round 6: 55.55; ok"></span></div><span class="bar-number"><strong>41.1</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rqbit</span><div class="public-track"><span class="public-range" style="left:33.0388%;width:8.9498%"></span><span class="public-iqr" style="left:38.1770%;width:2.2146%"></span><span class="public-median" style="left:39.3276%"></span><span class="public-point" style="left:38.4669%;top:4px" role="img" aria-label="Round 1: 34.65; ok" title="Round 1: 34.65; ok"></span><span class="public-point" style="left:33.0388%;top:8px" role="img" aria-label="Round 2: 29.76; ok" title="Round 2: 29.76; ok"></span><span class="public-point" style="left:41.9887%;top:12px" role="img" aria-label="Round 3: 37.83; ok" title="Round 3: 37.83; ok"></span><span class="public-point" style="left:40.4593%;top:16px" role="img" aria-label="Round 4: 36.45; ok" title="Round 4: 36.45; ok"></span><span class="public-point" style="left:38.0803%;top:20px" role="img" aria-label="Round 5: 34.31; ok" title="Round 5: 34.31; ok"></span><span class="public-point" style="left:40.1883%;top:24px" role="img" aria-label="Round 6: 36.20; ok" title="Round 6: 36.20; ok"></span></div><span class="bar-number"><strong>35.4</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">aria2</span><div class="public-track"><span class="public-range" style="left:10.7157%;width:83.6239%"></span><span class="public-iqr" style="left:30.1534%;width:39.9749%"></span><span class="public-median" style="left:35.9446%"></span><span class="public-point" style="left:35.9446%;top:4px" role="img" aria-label="Round 1: 32.38; ok" title="Round 1: 32.38; ok"></span><span class="public-point" style="left:30.1534%;top:12px" role="img" aria-label="Round 3: 27.16; ok" title="Round 3: 27.16; ok"></span><span class="public-point" style="left:70.1283%;top:16px" role="img" aria-label="Round 4: 63.18; ok" title="Round 4: 63.18; ok"></span><span class="public-point" style="left:94.3396%;top:20px" role="img" aria-label="Round 5: 84.99; ok" title="Round 5: 84.99; ok"></span><span class="public-point" style="left:10.7157%;top:24px" role="img" aria-label="Round 6: 9.65; ok" title="Round 6: 9.65; ok"></span></div><span class="bar-number"><strong>32.4</strong><small>5 observations</small></span></div><div class="public-axis"><span></span><span>0 <span>90.1</span></span><span>Median</span></div></div><div class="public-panel" data-metric="penalized_s" hidden><p class="public-description"><strong>Deadline-penalized time, seconds.</strong> Lower is faster; a failed attempt receives 900 seconds.</p><div class="public-row"><span class="bar-name">qBittorrent</span><div class="public-track"><span class="public-range" style="left:7.5182%;width:5.0210%"></span><span class="public-iqr" style="left:8.2170%;width:2.4953%"></span><span class="public-median" style="left:9.2413%"></span><span class="public-point" style="left:11.0949%;top:4px" role="img" aria-label="Round 1: 105.85; ok" title="Round 1: 105.85; ok"></span><span class="public-point" style="left:7.5182%;top:8px" role="img" aria-label="Round 2: 71.72; ok" title="Round 2: 71.72; ok"></span><span class="public-point" style="left:8.9179%;top:12px" role="img" aria-label="Round 3: 85.08; ok" title="Round 3: 85.08; ok"></span><span class="public-point" style="left:9.5647%;top:16px" role="img" aria-label="Round 4: 91.25; ok" title="Round 4: 91.25; ok"></span><span class="public-point" style="left:12.5392%;top:20px" role="img" aria-label="Round 5: 119.62; ok" title="Round 5: 119.62; ok"></span><span class="public-point" style="left:7.9834%;top:24px" role="img" aria-label="Round 6: 76.16; ok" title="Round 6: 76.16; ok"></span></div><span class="bar-number"><strong>88.2</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Deluge</span><div class="public-track"><span class="public-range" style="left:25.7619%;width:68.5777%"></span><span class="public-iqr" style="left:43.1776%;width:51.1621%"></span><span class="public-median" style="left:94.3396%"></span><span class="public-point" style="left:26.1235%;top:4px" role="img" aria-label="Round 1: 249.22; ok" title="Round 1: 249.22; ok"></span><span class="public-point incomplete" style="left:94.3396%;top:8px" role="img" aria-label="Round 2: 900.00; timeout" title="Round 2: 900.00; timeout"></span><span class="public-point incomplete" style="left:94.3396%;top:12px" role="img" aria-label="Round 3: 900.00; timeout" title="Round 3: 900.00; timeout"></span><span class="public-point" style="left:25.7619%;top:16px" role="img" aria-label="Round 4: 245.77; ok" title="Round 4: 245.77; ok"></span><span class="public-point incomplete" style="left:94.3396%;top:20px" role="img" aria-label="Round 5: 900.00; timeout" title="Round 5: 900.00; timeout"></span><span class="public-point incomplete" style="left:94.3396%;top:24px" role="img" aria-label="Round 6: 900.00; timeout" title="Round 6: 900.00; timeout"></span></div><span class="bar-number"><strong>900.0</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Transmission</span><div class="public-track"><span class="public-range" style="left:11.9021%;width:82.4375%"></span><span class="public-iqr" style="left:19.3941%;width:13.1963%"></span><span class="public-median" style="left:20.5844%"></span><span class="public-point" style="left:21.0145%;top:4px" role="img" aria-label="Round 1: 200.48; ok" title="Round 1: 200.48; ok"></span><span class="public-point" style="left:19.1406%;top:8px" role="img" aria-label="Round 2: 182.60; ok" title="Round 2: 182.60; ok"></span><span class="public-point incomplete" style="left:94.3396%;top:12px" role="img" aria-label="Round 3: 900.00; timeout" title="Round 3: 900.00; timeout"></span><span class="public-point" style="left:11.9021%;top:16px" role="img" aria-label="Round 4: 113.55; ok" title="Round 4: 113.55; ok"></span><span class="public-point" style="left:36.4489%;top:20px" role="img" aria-label="Round 5: 347.72; ok" title="Round 5: 347.72; ok"></span><span class="public-point" style="left:20.1544%;top:24px" role="img" aria-label="Round 6: 192.27; ok" title="Round 6: 192.27; ok"></span></div><span class="bar-number"><strong>196.4</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rTorrent</span><div class="public-track"><span class="public-range" style="left:4.9649%;width:2.7036%"></span><span class="public-iqr" style="left:5.6233%;width:2.0035%"></span><span class="public-median" style="left:7.1540%"></span><span class="public-point" style="left:4.9649%;top:4px" role="img" aria-label="Round 1: 47.36; ok" title="Round 1: 47.36; ok"></span><span class="public-point" style="left:7.6221%;top:8px" role="img" aria-label="Round 2: 72.71; ok" title="Round 2: 72.71; ok"></span><span class="public-point" style="left:7.6284%;top:12px" role="img" aria-label="Round 3: 72.77; ok" title="Round 3: 72.77; ok"></span><span class="public-point" style="left:6.6859%;top:16px" role="img" aria-label="Round 4: 63.78; ok" title="Round 4: 63.78; ok"></span><span class="public-point" style="left:7.6684%;top:20px" role="img" aria-label="Round 5: 73.16; ok" title="Round 5: 73.16; ok"></span><span class="public-point" style="left:5.2691%;top:24px" role="img" aria-label="Round 6: 50.27; ok" title="Round 6: 50.27; ok"></span></div><span class="bar-number"><strong>68.2</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rqbit</span><div class="public-track"><span class="public-range" style="left:7.7376%;width:2.0960%"></span><span class="public-iqr" style="left:8.0436%;width:0.4667%"></span><span class="public-median" style="left:8.2651%"></span><span class="public-point" style="left:8.4460%;top:4px" role="img" aria-label="Round 1: 80.58; ok" title="Round 1: 80.58; ok"></span><span class="public-point" style="left:9.8337%;top:8px" role="img" aria-label="Round 2: 93.81; ok" title="Round 2: 93.81; ok"></span><span class="public-point" style="left:7.7376%;top:12px" role="img" aria-label="Round 3: 73.82; ok" title="Round 3: 73.82; ok"></span><span class="public-point" style="left:8.0301%;top:16px" role="img" aria-label="Round 4: 76.61; ok" title="Round 4: 76.61; ok"></span><span class="public-point" style="left:8.5318%;top:20px" role="img" aria-label="Round 5: 81.39; ok" title="Round 5: 81.39; ok"></span><span class="public-point" style="left:8.0843%;top:24px" role="img" aria-label="Round 6: 77.12; ok" title="Round 6: 77.12; ok"></span></div><span class="bar-number"><strong>78.8</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">aria2</span><div class="public-track"><span class="public-range" style="left:3.4439%;width:90.8958%"></span><span class="public-iqr" style="left:5.7343%;width:19.6988%"></span><span class="public-median" style="left:9.9067%"></span><span class="public-point" style="left:9.0387%;top:4px" role="img" aria-label="Round 1: 86.23; ok" title="Round 1: 86.23; ok"></span><span class="public-point incomplete" style="left:94.3396%;top:8px" role="img" aria-label="Round 2: 900.00; timeout" title="Round 2: 900.00; timeout"></span><span class="public-point" style="left:10.7747%;top:12px" role="img" aria-label="Round 3: 102.79; ok" title="Round 3: 102.79; ok"></span><span class="public-point" style="left:4.6328%;top:16px" role="img" aria-label="Round 4: 44.20; ok" title="Round 4: 44.20; ok"></span><span class="public-point" style="left:3.4439%;top:20px" role="img" aria-label="Round 5: 32.85; ok" title="Round 5: 32.85; ok"></span><span class="public-point" style="left:30.3193%;top:24px" role="img" aria-label="Round 6: 289.25; ok" title="Round 6: 289.25; ok"></span></div><span class="bar-number"><strong>94.5</strong><small>6 observations</small></span></div><div class="public-axis"><span></span><span>0 <span>954.0</span></span><span>Median</span></div></div><div class="public-panel" data-metric="peak_anon_mib" hidden><p class="public-description"><strong>Peak anonymous memory, MiB.</strong> Resident application allocations; all attempts.</p><div class="public-row"><span class="bar-name">qBittorrent</span><div class="public-track"><span class="public-range" style="left:25.5236%;width:45.1101%"></span><span class="public-iqr" style="left:27.3504%;width:5.5386%"></span><span class="public-median" style="left:28.5261%"></span><span class="public-point" style="left:29.1646%;top:4px" role="img" aria-label="Round 1: 40.24; ok" title="Round 1: 40.24; ok"></span><span class="public-point" style="left:70.6337%;top:8px" role="img" aria-label="Round 2: 97.45; ok" title="Round 2: 97.45; ok"></span><span class="public-point" style="left:25.5236%;top:12px" role="img" aria-label="Round 3: 35.21; ok" title="Round 3: 35.21; ok"></span><span class="public-point" style="left:27.1714%;top:16px" role="img" aria-label="Round 4: 37.49; ok" title="Round 4: 37.49; ok"></span><span class="public-point" style="left:34.1306%;top:20px" role="img" aria-label="Round 5: 47.09; ok" title="Round 5: 47.09; ok"></span><span class="public-point" style="left:27.8877%;top:24px" role="img" aria-label="Round 6: 38.48; ok" title="Round 6: 38.48; ok"></span></div><span class="bar-number"><strong>39.4</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Deluge</span><div class="public-track"><span class="public-range" style="left:59.1757%;width:35.1640%"></span><span class="public-iqr" style="left:59.7816%;width:17.7419%"></span><span class="public-median" style="left:60.6026%"></span><span class="public-point" style="left:94.3396%;top:4px" role="img" aria-label="Round 1: 130.16; ok" title="Round 1: 130.16; ok"></span><span class="public-point incomplete" style="left:60.7357%;top:8px" role="img" aria-label="Round 2: 83.80; timeout" title="Round 2: 83.80; timeout"></span><span class="public-point incomplete" style="left:59.1757%;top:12px" role="img" aria-label="Round 3: 81.64; timeout" title="Round 3: 81.64; timeout"></span><span class="public-point" style="left:83.1194%;top:16px" role="img" aria-label="Round 4: 114.68; ok" title="Round 4: 114.68; ok"></span><span class="public-point incomplete" style="left:60.4695%;top:20px" role="img" aria-label="Round 5: 83.43; timeout" title="Round 5: 83.43; timeout"></span><span class="public-point incomplete" style="left:59.5522%;top:24px" role="img" aria-label="Round 6: 82.16; timeout" title="Round 6: 82.16; timeout"></span></div><span class="bar-number"><strong>83.6</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Transmission</span><div class="public-track"><span class="public-range" style="left:21.1210%;width:14.9659%"></span><span class="public-iqr" style="left:27.8742%;width:4.8258%"></span><span class="public-median" style="left:31.3489%"></span><span class="public-point" style="left:27.0326%;top:4px" role="img" aria-label="Round 1: 37.30; ok" title="Round 1: 37.30; ok"></span><span class="public-point" style="left:36.0869%;top:8px" role="img" aria-label="Round 2: 49.79; ok" title="Round 2: 49.79; ok"></span><span class="public-point incomplete" style="left:30.3990%;top:12px" role="img" aria-label="Round 3: 41.94; timeout" title="Round 3: 41.94; timeout"></span><span class="public-point" style="left:21.1210%;top:16px" role="img" aria-label="Round 4: 29.14; ok" title="Round 4: 29.14; ok"></span><span class="public-point" style="left:32.2987%;top:20px" role="img" aria-label="Round 5: 44.56; ok" title="Round 5: 44.56; ok"></span><span class="public-point" style="left:32.8338%;top:24px" role="img" aria-label="Round 6: 45.30; ok" title="Round 6: 45.30; ok"></span></div><span class="bar-number"><strong>43.3</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rTorrent</span><div class="public-track"><span class="public-range" style="left:4.6970%;width:2.7265%"></span><span class="public-iqr" style="left:5.5676%;width:0.6307%"></span><span class="public-median" style="left:5.9668%"></span><span class="public-point" style="left:5.9966%;top:4px" role="img" aria-label="Round 1: 8.27; ok" title="Round 1: 8.27; ok"></span><span class="public-point" style="left:6.2655%;top:8px" role="img" aria-label="Round 2: 8.64; ok" title="Round 2: 8.64; ok"></span><span class="public-point" style="left:5.4445%;top:12px" role="img" aria-label="Round 3: 7.51; ok" title="Round 3: 7.51; ok"></span><span class="public-point" style="left:7.4235%;top:16px" role="img" aria-label="Round 4: 10.24; ok" title="Round 4: 10.24; ok"></span><span class="public-point" style="left:5.9371%;top:20px" role="img" aria-label="Round 5: 8.19; ok" title="Round 5: 8.19; ok"></span><span class="public-point" style="left:4.6970%;top:24px" role="img" aria-label="Round 6: 6.48; ok" title="Round 6: 6.48; ok"></span></div><span class="bar-number"><strong>8.2</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rqbit</span><div class="public-track"><span class="public-range" style="left:14.1505%;width:0.2860%"></span><span class="public-iqr" style="left:14.2928%;width:0.1055%"></span><span class="public-median" style="left:14.3827%"></span><span class="public-point" style="left:14.3940%;top:4px" role="img" aria-label="Round 1: 19.86; ok" title="Round 1: 19.86; ok"></span><span class="public-point" style="left:14.3714%;top:8px" role="img" aria-label="Round 2: 19.83; ok" title="Round 2: 19.83; ok"></span><span class="public-point" style="left:14.4365%;top:12px" role="img" aria-label="Round 3: 19.92; ok" title="Round 3: 19.92; ok"></span><span class="public-point" style="left:14.1505%;top:16px" role="img" aria-label="Round 4: 19.52; ok" title="Round 4: 19.52; ok"></span><span class="public-point" style="left:14.3997%;top:20px" role="img" aria-label="Round 5: 19.87; ok" title="Round 5: 19.87; ok"></span><span class="public-point" style="left:14.2666%;top:24px" role="img" aria-label="Round 6: 19.68; ok" title="Round 6: 19.68; ok"></span></div><span class="bar-number"><strong>19.8</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">aria2</span><div class="public-track"><span class="public-range" style="left:4.0911%;width:4.8329%"></span><span class="public-iqr" style="left:4.6043%;width:3.0896%"></span><span class="public-median" style="left:6.0673%"></span><span class="public-point" style="left:4.3686%;top:4px" role="img" aria-label="Round 1: 6.03; ok" title="Round 1: 6.03; ok"></span><span class="public-point incomplete" style="left:4.0911%;top:8px" role="img" aria-label="Round 2: 5.64; timeout" title="Round 2: 5.64; timeout"></span><span class="public-point" style="left:8.9241%;top:12px" role="img" aria-label="Round 3: 12.31; ok" title="Round 3: 12.31; ok"></span><span class="public-point" style="left:7.9841%;top:16px" role="img" aria-label="Round 4: 11.02; ok" title="Round 4: 11.02; ok"></span><span class="public-point" style="left:5.3114%;top:20px" role="img" aria-label="Round 5: 7.33; ok" title="Round 5: 7.33; ok"></span><span class="public-point" style="left:6.8233%;top:24px" role="img" aria-label="Round 6: 9.41; ok" title="Round 6: 9.41; ok"></span></div><span class="bar-number"><strong>8.4</strong><small>6 observations</small></span></div><div class="public-axis"><span></span><span>0 <span>138.0</span></span><span>Median</span></div></div><div class="public-panel" data-metric="peak_rss_mib" hidden><p class="public-description"><strong>Peak RSS, MiB.</strong> Resident process pages, including mappings; all attempts.</p><div class="public-row"><span class="bar-name">qBittorrent</span><div class="public-track"><span class="public-range" style="left:4.1219%;width:5.9461%"></span><span class="public-iqr" style="left:4.2507%;width:0.6137%"></span><span class="public-median" style="left:4.6007%"></span><span class="public-point" style="left:4.8642%;top:4px" role="img" aria-label="Round 1: 77.56; ok" title="Round 1: 77.56; ok"></span><span class="public-point" style="left:10.0679%;top:8px" role="img" aria-label="Round 2: 160.53; ok" title="Round 2: 160.53; ok"></span><span class="public-point" style="left:4.1219%;top:12px" role="img" aria-label="Round 3: 65.72; ok" title="Round 3: 65.72; ok"></span><span class="public-point" style="left:4.2218%;top:16px" role="img" aria-label="Round 4: 67.32; ok" title="Round 4: 67.32; ok"></span><span class="public-point" style="left:4.8644%;top:20px" role="img" aria-label="Round 5: 77.56; ok" title="Round 5: 77.56; ok"></span><span class="public-point" style="left:4.3372%;top:24px" role="img" aria-label="Round 6: 69.16; ok" title="Round 6: 69.16; ok"></span></div><span class="bar-number"><strong>73.4</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Deluge</span><div class="public-track"><span class="public-range" style="left:8.9317%;width:85.4079%"></span><span class="public-iqr" style="left:8.9629%;width:63.9502%"></span><span class="public-median" style="left:9.8668%"></span><span class="public-point" style="left:93.6495%;top:4px" role="img" aria-label="Round 1: 1493.22; ok" title="Round 1: 1493.22; ok"></span><span class="public-point incomplete" style="left:10.7042%;top:8px" role="img" aria-label="Round 2: 170.68; timeout" title="Round 2: 170.68; timeout"></span><span class="public-point incomplete" style="left:8.9317%;top:12px" role="img" aria-label="Round 3: 142.41; timeout" title="Round 3: 142.41; timeout"></span><span class="public-point" style="left:94.3396%;top:16px" role="img" aria-label="Round 4: 1504.23; ok" title="Round 4: 1504.23; ok"></span><span class="public-point incomplete" style="left:9.0294%;top:20px" role="img" aria-label="Round 5: 143.97; timeout" title="Round 5: 143.97; timeout"></span><span class="public-point incomplete" style="left:8.9408%;top:24px" role="img" aria-label="Round 6: 142.56; timeout" title="Round 6: 142.56; timeout"></span></div><span class="bar-number"><strong>157.3</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Transmission</span><div class="public-track"><span class="public-range" style="left:2.7683%;width:1.2864%"></span><span class="public-iqr" style="left:3.3994%;width:0.4050%"></span><span class="public-median" style="left:3.6617%"></span><span class="public-point" style="left:3.3338%;top:4px" role="img" aria-label="Round 1: 53.16; ok" title="Round 1: 53.16; ok"></span><span class="public-point" style="left:4.0548%;top:8px" role="img" aria-label="Round 2: 64.65; ok" title="Round 2: 64.65; ok"></span><span class="public-point incomplete" style="left:3.5961%;top:12px" role="img" aria-label="Round 3: 57.34; timeout" title="Round 3: 57.34; timeout"></span><span class="public-point" style="left:2.7683%;top:16px" role="img" aria-label="Round 4: 44.14; ok" title="Round 4: 44.14; ok"></span><span class="public-point" style="left:3.7272%;top:20px" role="img" aria-label="Round 5: 59.43; ok" title="Round 5: 59.43; ok"></span><span class="public-point" style="left:3.8301%;top:24px" role="img" aria-label="Round 6: 61.07; ok" title="Round 6: 61.07; ok"></span></div><span class="bar-number"><strong>58.4</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rTorrent</span><div class="public-track"><span class="public-range" style="left:76.8136%;width:7.6656%"></span><span class="public-iqr" style="left:77.1673%;width:5.2350%"></span><span class="public-median" style="left:78.7937%"></span><span class="public-point" style="left:76.8136%;top:4px" role="img" aria-label="Round 1: 1224.78; ok" title="Round 1: 1224.78; ok"></span><span class="public-point" style="left:76.8547%;top:8px" role="img" aria-label="Round 2: 1225.43; ok" title="Round 2: 1225.43; ok"></span><span class="public-point" style="left:79.4822%;top:12px" role="img" aria-label="Round 3: 1267.33; ok" title="Round 3: 1267.33; ok"></span><span class="public-point" style="left:84.4792%;top:16px" role="img" aria-label="Round 4: 1347.00; ok" title="Round 4: 1347.00; ok"></span><span class="public-point" style="left:78.1051%;top:20px" role="img" aria-label="Round 5: 1245.37; ok" title="Round 5: 1245.37; ok"></span><span class="public-point" style="left:83.3758%;top:24px" role="img" aria-label="Round 6: 1329.41; ok" title="Round 6: 1329.41; ok"></span></div><span class="bar-number"><strong>1256.3</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rqbit</span><div class="public-track"><span class="public-range" style="left:2.0199%;width:0.0250%"></span><span class="public-iqr" style="left:2.0323%;width:0.0090%"></span><span class="public-median" style="left:2.0402%"></span><span class="public-point" style="left:2.0410%;top:4px" role="img" aria-label="Round 1: 32.54; ok" title="Round 1: 32.54; ok"></span><span class="public-point" style="left:2.0395%;top:8px" role="img" aria-label="Round 2: 32.52; ok" title="Round 2: 32.52; ok"></span><span class="public-point" style="left:2.0449%;top:12px" role="img" aria-label="Round 3: 32.61; ok" title="Round 3: 32.61; ok"></span><span class="public-point" style="left:2.0199%;top:16px" role="img" aria-label="Round 4: 32.21; ok" title="Round 4: 32.21; ok"></span><span class="public-point" style="left:2.0415%;top:20px" role="img" aria-label="Round 5: 32.55; ok" title="Round 5: 32.55; ok"></span><span class="public-point" style="left:2.0300%;top:24px" role="img" aria-label="Round 6: 32.37; ok" title="Round 6: 32.37; ok"></span></div><span class="bar-number"><strong>32.5</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">aria2</span><div class="public-track"><span class="public-range" style="left:0.9219%;width:0.4224%"></span><span class="public-iqr" style="left:0.9771%;width:0.2563%"></span><span class="public-median" style="left:1.0991%"></span><span class="public-point" style="left:0.9567%;top:4px" role="img" aria-label="Round 1: 15.25; ok" title="Round 1: 15.25; ok"></span><span class="public-point incomplete" style="left:0.9219%;top:8px" role="img" aria-label="Round 2: 14.70; timeout" title="Round 2: 14.70; timeout"></span><span class="public-point" style="left:1.3442%;top:12px" role="img" aria-label="Round 3: 21.43; ok" title="Round 3: 21.43; ok"></span><span class="public-point" style="left:1.2578%;top:16px" role="img" aria-label="Round 4: 20.05; ok" title="Round 4: 20.05; ok"></span><span class="public-point" style="left:1.0382%;top:20px" role="img" aria-label="Round 5: 16.55; ok" title="Round 5: 16.55; ok"></span><span class="public-point" style="left:1.1600%;top:24px" role="img" aria-label="Round 6: 18.50; ok" title="Round 6: 18.50; ok"></span></div><span class="bar-number"><strong>17.5</strong><small>6 observations</small></span></div><div class="public-axis"><span></span><span>0 <span>1594.5</span></span><span>Median</span></div></div><div class="public-panel" data-metric="peak_memory_mib" hidden><p class="public-description"><strong>Peak charged memory, MiB.</strong> Container memory including filesystem cache; all attempts.</p><div class="public-row"><span class="bar-name">qBittorrent</span><div class="public-track"><span class="public-range" style="left:94.2428%;width:0.0391%"></span><span class="public-iqr" style="left:94.2439%;width:0.0102%"></span><span class="public-median" style="left:94.2465%"></span><span class="public-point" style="left:94.2565%;top:4px" role="img" aria-label="Round 1: 1536.20; ok" title="Round 1: 1536.20; ok"></span><span class="public-point" style="left:94.2471%;top:8px" role="img" aria-label="Round 2: 1536.05; ok" title="Round 2: 1536.05; ok"></span><span class="public-point" style="left:94.2433%;top:12px" role="img" aria-label="Round 3: 1535.99; ok" title="Round 3: 1535.99; ok"></span><span class="public-point" style="left:94.2459%;top:16px" role="img" aria-label="Round 4: 1536.03; ok" title="Round 4: 1536.03; ok"></span><span class="public-point" style="left:94.2819%;top:20px" role="img" aria-label="Round 5: 1536.62; ok" title="Round 5: 1536.62; ok"></span><span class="public-point" style="left:94.2428%;top:24px" role="img" aria-label="Round 6: 1535.98; ok" title="Round 6: 1535.98; ok"></span></div><span class="bar-number"><strong>1536.0</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Deluge</span><div class="public-track"><span class="public-range" style="left:5.4322%;width:88.9074%"></span><span class="public-iqr" style="left:5.4695%;width:67.0375%"></span><span class="public-median" style="left:6.3664%"></span><span class="public-point" style="left:94.3396%;top:4px" role="img" aria-label="Round 1: 1537.56; ok" title="Round 1: 1537.56; ok"></span><span class="public-point incomplete" style="left:7.2032%;top:8px" role="img" aria-label="Round 2: 117.40; timeout" title="Round 2: 117.40; timeout"></span><span class="public-point incomplete" style="left:5.4322%;top:12px" role="img" aria-label="Round 3: 88.54; timeout" title="Round 3: 88.54; timeout"></span><span class="public-point" style="left:94.2749%;top:16px" role="img" aria-label="Round 4: 1536.50; ok" title="Round 4: 1536.50; ok"></span><span class="public-point incomplete" style="left:5.5295%;top:20px" role="img" aria-label="Round 5: 90.12; timeout" title="Round 5: 90.12; timeout"></span><span class="public-point incomplete" style="left:5.4495%;top:24px" role="img" aria-label="Round 6: 88.82; timeout" title="Round 6: 88.82; timeout"></span></div><span class="bar-number"><strong>103.8</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Transmission</span><div class="public-track"><span class="public-range" style="left:94.2716%;width:0.0419%"></span><span class="public-iqr" style="left:94.2775%;width:0.0113%"></span><span class="public-median" style="left:94.2805%"></span><span class="public-point" style="left:94.2780%;top:4px" role="img" aria-label="Round 1: 1536.55; ok" title="Round 1: 1536.55; ok"></span><span class="public-point" style="left:94.2907%;top:8px" role="img" aria-label="Round 2: 1536.76; ok" title="Round 2: 1536.76; ok"></span><span class="public-point incomplete" style="left:94.2716%;top:12px" role="img" aria-label="Round 3: 1536.45; timeout" title="Round 3: 1536.45; timeout"></span><span class="public-point" style="left:94.2831%;top:16px" role="img" aria-label="Round 4: 1536.64; ok" title="Round 4: 1536.64; ok"></span><span class="public-point" style="left:94.2773%;top:20px" role="img" aria-label="Round 5: 1536.54; ok" title="Round 5: 1536.54; ok"></span><span class="public-point" style="left:94.3135%;top:24px" role="img" aria-label="Round 6: 1537.13; ok" title="Round 6: 1537.13; ok"></span></div><span class="bar-number"><strong>1536.6</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rTorrent</span><div class="public-track"><span class="public-range" style="left:94.2418%;width:0.0904%"></span><span class="public-iqr" style="left:94.2621%;width:0.0476%"></span><span class="public-median" style="left:94.2871%"></span><span class="public-point" style="left:94.3145%;top:4px" role="img" aria-label="Round 1: 1537.15; ok" title="Round 1: 1537.15; ok"></span><span class="public-point" style="left:94.2958%;top:8px" role="img" aria-label="Round 2: 1536.84; ok" title="Round 2: 1536.84; ok"></span><span class="public-point" style="left:94.2785%;top:12px" role="img" aria-label="Round 3: 1536.56; ok" title="Round 3: 1536.56; ok"></span><span class="public-point" style="left:94.3322%;top:16px" role="img" aria-label="Round 4: 1537.44; ok" title="Round 4: 1537.44; ok"></span><span class="public-point" style="left:94.2567%;top:20px" role="img" aria-label="Round 5: 1536.21; ok" title="Round 5: 1536.21; ok"></span><span class="public-point" style="left:94.2418%;top:24px" role="img" aria-label="Round 6: 1535.96; ok" title="Round 6: 1535.96; ok"></span></div><span class="bar-number"><strong>1536.7</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rqbit</span><div class="public-track"><span class="public-range" style="left:94.2461%;width:0.0762%"></span><span class="public-iqr" style="left:94.2487%;width:0.0067%"></span><span class="public-median" style="left:94.2505%"></span><span class="public-point" style="left:94.2519%;top:4px" role="img" aria-label="Round 1: 1536.13; ok" title="Round 1: 1536.13; ok"></span><span class="public-point" style="left:94.2485%;top:8px" role="img" aria-label="Round 2: 1536.07; ok" title="Round 2: 1536.07; ok"></span><span class="public-point" style="left:94.2490%;top:12px" role="img" aria-label="Round 3: 1536.08; ok" title="Round 3: 1536.08; ok"></span><span class="public-point" style="left:94.2461%;top:16px" role="img" aria-label="Round 4: 1536.04; ok" title="Round 4: 1536.04; ok"></span><span class="public-point" style="left:94.2565%;top:20px" role="img" aria-label="Round 5: 1536.20; ok" title="Round 5: 1536.20; ok"></span><span class="public-point" style="left:94.3224%;top:24px" role="img" aria-label="Round 6: 1537.28; ok" title="Round 6: 1537.28; ok"></span></div><span class="bar-number"><strong>1536.1</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">aria2</span><div class="public-track"><span class="public-range" style="left:2.6069%;width:91.6620%"></span><span class="public-iqr" style="left:94.2437%;width:0.0068%"></span><span class="public-median" style="left:94.2457%"></span><span class="public-point" style="left:94.2442%;top:4px" role="img" aria-label="Round 1: 1536.00; ok" title="Round 1: 1536.00; ok"></span><span class="public-point incomplete" style="left:2.6069%;top:8px" role="img" aria-label="Round 2: 42.49; timeout" title="Round 2: 42.49; timeout"></span><span class="public-point" style="left:94.2689%;top:12px" role="img" aria-label="Round 3: 1536.41; ok" title="Round 3: 1536.41; ok"></span><span class="public-point" style="left:94.2517%;top:16px" role="img" aria-label="Round 4: 1536.12; ok" title="Round 4: 1536.12; ok"></span><span class="public-point" style="left:94.2471%;top:20px" role="img" aria-label="Round 5: 1536.05; ok" title="Round 5: 1536.05; ok"></span><span class="public-point" style="left:94.2435%;top:24px" role="img" aria-label="Round 6: 1535.99; ok" title="Round 6: 1535.99; ok"></span></div><span class="bar-number"><strong>1536.0</strong><small>6 observations</small></span></div><div class="public-axis"><span></span><span>0 <span>1629.8</span></span><span>Median</span></div></div><div class="public-panel" data-metric="cpu_s" hidden><p class="public-description"><strong>CPU cost, core-seconds.</strong> CPU time accumulated during the measured download; all attempts.</p><div class="public-row"><span class="bar-name">qBittorrent</span><div class="public-track"><span class="public-range" style="left:20.6183%;width:12.0976%"></span><span class="public-iqr" style="left:21.1351%;width:3.6406%"></span><span class="public-median" style="left:21.3474%"></span><span class="public-point" style="left:32.7159%;top:4px" role="img" aria-label="Round 1: 46.05; ok" title="Round 1: 46.05; ok"></span><span class="public-point" style="left:21.0974%;top:8px" role="img" aria-label="Round 2: 29.70; ok" title="Round 2: 29.70; ok"></span><span class="public-point" style="left:21.2480%;top:12px" role="img" aria-label="Round 3: 29.91; ok" title="Round 3: 29.91; ok"></span><span class="public-point" style="left:21.4467%;top:16px" role="img" aria-label="Round 4: 30.19; ok" title="Round 4: 30.19; ok"></span><span class="public-point" style="left:25.8853%;top:20px" role="img" aria-label="Round 5: 36.44; ok" title="Round 5: 36.44; ok"></span><span class="public-point" style="left:20.6183%;top:24px" role="img" aria-label="Round 6: 29.02; ok" title="Round 6: 29.02; ok"></span></div><span class="bar-number"><strong>30.0</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Deluge</span><div class="public-track"><span class="public-range" style="left:17.2158%;width:77.1239%"></span><span class="public-iqr" style="left:17.4931%;width:48.4531%"></span><span class="public-median" style="left:18.4974%"></span><span class="public-point" style="left:94.3396%;top:4px" role="img" aria-label="Round 1: 132.79; ok" title="Round 1: 132.79; ok"></span><span class="public-point incomplete" style="left:18.9780%;top:8px" role="img" aria-label="Round 2: 26.71; timeout" title="Round 2: 26.71; timeout"></span><span class="public-point incomplete" style="left:18.0167%;top:12px" role="img" aria-label="Round 3: 25.36; timeout" title="Round 3: 25.36; timeout"></span><span class="public-point" style="left:81.6023%;top:16px" role="img" aria-label="Round 4: 114.86; ok" title="Round 4: 114.86; ok"></span><span class="public-point incomplete" style="left:17.3186%;top:20px" role="img" aria-label="Round 5: 24.38; timeout" title="Round 5: 24.38; timeout"></span><span class="public-point incomplete" style="left:17.2158%;top:24px" role="img" aria-label="Round 6: 24.23; timeout" title="Round 6: 24.23; timeout"></span></div><span class="bar-number"><strong>26.0</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">Transmission</span><div class="public-track"><span class="public-range" style="left:21.5811%;width:22.6781%"></span><span class="public-iqr" style="left:30.4327%;width:5.7285%"></span><span class="public-median" style="left:32.5467%"></span><span class="public-point" style="left:36.7820%;top:4px" role="img" aria-label="Round 1: 51.77; ok" title="Round 1: 51.77; ok"></span><span class="public-point" style="left:30.7946%;top:8px" role="img" aria-label="Round 2: 43.35; ok" title="Round 2: 43.35; ok"></span><span class="public-point incomplete" style="left:44.2592%;top:12px" role="img" aria-label="Round 3: 62.30; timeout" title="Round 3: 62.30; timeout"></span><span class="public-point" style="left:21.5811%;top:16px" role="img" aria-label="Round 4: 30.38; ok" title="Round 4: 30.38; ok"></span><span class="public-point" style="left:34.2988%;top:20px" role="img" aria-label="Round 5: 48.28; ok" title="Round 5: 48.28; ok"></span><span class="public-point" style="left:30.3120%;top:24px" role="img" aria-label="Round 6: 42.67; ok" title="Round 6: 42.67; ok"></span></div><span class="bar-number"><strong>45.8</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rTorrent</span><div class="public-track"><span class="public-range" style="left:19.8908%;width:12.3000%"></span><span class="public-iqr" style="left:21.8503%;width:2.5282%"></span><span class="public-median" style="left:23.0099%"></span><span class="public-point" style="left:32.1908%;top:4px" role="img" aria-label="Round 1: 45.31; ok" title="Round 1: 45.31; ok"></span><span class="public-point" style="left:24.5120%;top:8px" role="img" aria-label="Round 2: 34.50; ok" title="Round 2: 34.50; ok"></span><span class="public-point" style="left:22.0417%;top:12px" role="img" aria-label="Round 3: 31.03; ok" title="Round 3: 31.03; ok"></span><span class="public-point" style="left:23.9780%;top:16px" role="img" aria-label="Round 4: 33.75; ok" title="Round 4: 33.75; ok"></span><span class="public-point" style="left:21.7864%;top:20px" role="img" aria-label="Round 5: 30.67; ok" title="Round 5: 30.67; ok"></span><span class="public-point" style="left:19.8908%;top:24px" role="img" aria-label="Round 6: 28.00; ok" title="Round 6: 28.00; ok"></span></div><span class="bar-number"><strong>32.4</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">rqbit</span><div class="public-track"><span class="public-range" style="left:23.7608%;width:12.2637%"></span><span class="public-iqr" style="left:24.2044%;width:6.3014%"></span><span class="public-median" style="left:25.3724%"></span><span class="public-point" style="left:32.1985%;top:4px" role="img" aria-label="Round 1: 45.32; ok" title="Round 1: 45.32; ok"></span><span class="public-point" style="left:36.0246%;top:8px" role="img" aria-label="Round 2: 50.71; ok" title="Round 2: 50.71; ok"></span><span class="public-point" style="left:23.7608%;top:12px" role="img" aria-label="Round 3: 33.45; ok" title="Round 3: 33.45; ok"></span><span class="public-point" style="left:25.4279%;top:16px" role="img" aria-label="Round 4: 35.79; ok" title="Round 4: 35.79; ok"></span><span class="public-point" style="left:25.3169%;top:20px" role="img" aria-label="Round 5: 35.64; ok" title="Round 5: 35.64; ok"></span><span class="public-point" style="left:23.8336%;top:24px" role="img" aria-label="Round 6: 33.55; ok" title="Round 6: 33.55; ok"></span></div><span class="bar-number"><strong>35.7</strong><small>6 observations</small></span></div><div class="public-row"><span class="bar-name">aria2</span><div class="public-track"><span class="public-range" style="left:3.5776%;width:17.8184%"></span><span class="public-iqr" style="left:16.5302%;width:2.6512%"></span><span class="public-median" style="left:18.5702%"></span><span class="public-point" style="left:19.2446%;top:4px" role="img" aria-label="Round 1: 27.09; ok" title="Round 1: 27.09; ok"></span><span class="public-point incomplete" style="left:3.5776%;top:8px" role="img" aria-label="Round 2: 5.04; timeout" title="Round 2: 5.04; timeout"></span><span class="public-point" style="left:21.3960%;top:12px" role="img" aria-label="Round 3: 30.12; ok" title="Round 3: 30.12; ok"></span><span class="public-point" style="left:18.9917%;top:16px" role="img" aria-label="Round 4: 26.73; ok" title="Round 4: 26.73; ok"></span><span class="public-point" style="left:15.9906%;top:20px" role="img" aria-label="Round 5: 22.51; ok" title="Round 5: 22.51; ok"></span><span class="public-point" style="left:18.1488%;top:24px" role="img" aria-label="Round 6: 25.55; ok" title="Round 6: 25.55; ok"></span></div><span class="bar-number"><strong>26.1</strong><small>6 observations</small></span></div><div class="public-axis"><span></span><span>0 <span>140.8</span></span><span>Median</span></div></div><figcaption>Each dot is one attempt; the shaded band is the interquartile range, the vertical line is the median, and the thin line is the full range. These ranges describe observations, not confidence intervals. Hollow dots indicate failed attempts. Failures receive no complete-file speed.</figcaption></figure>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">Completed</th>
+<th scope="col" class="num">Wilson 95% completion interval</th>
+<th scope="col" class="num">Median MiB/s</th>
+<th scope="col" class="num">IQR MiB/s</th>
+<th scope="col" class="num">Range MiB/s</th>
+<th scope="col" class="num">Median seconds</th>
+<th scope="col" class="num">Mean penalized seconds</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td class="num">6/6</td>
+<td class="num">61.0%–100.0%</td>
+<td class="num">31.71</td>
+<td class="num">27.44–35.70</td>
+<td class="num">23.34–38.93</td>
+<td class="num">88.16</td>
+<td class="num">91.61</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td class="num">2/6</td>
+<td class="num">9.7%–70.0%</td>
+<td class="num">11.28</td>
+<td class="num">11.24–11.32</td>
+<td class="num">11.20–11.36</td>
+<td class="num">247.49</td>
+<td class="num">682.50</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td class="num">5/6</td>
+<td class="num">43.6%–97.0%</td>
+<td class="num">14.52</td>
+<td class="num">13.93–15.29</td>
+<td class="num">8.03–24.59</td>
+<td class="num">192.27</td>
+<td class="num">322.77</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td class="num">6/6</td>
+<td class="num">61.0%–100.0%</td>
+<td class="num">41.09</td>
+<td class="num">38.38–52.60</td>
+<td class="num">38.17–58.95</td>
+<td class="num">68.25</td>
+<td class="num">63.34</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num">6/6</td>
+<td class="num">61.0%–100.0%</td>
+<td class="num">35.43</td>
+<td class="num">34.39–36.39</td>
+<td class="num">29.76–37.83</td>
+<td class="num">78.85</td>
+<td class="num">80.55</td>
+</tr>
+<tr>
+<th scope="row">aria2</th>
+<td class="num">5/6</td>
+<td class="num">43.6%–97.0%</td>
+<td class="num">32.38</td>
+<td class="num">27.16–63.18</td>
+<td class="num">9.65–84.99</td>
+<td class="num">86.23</td>
+<td class="num">242.55</td>
+</tr>
+</tbody></table></div>
+<p><strong>All-attempt resource costs, including failed/partial work.</strong> Memory cells show the median of per-attempt sampled peaks / the largest sampled peak. Charged memory includes filesystem cache; RSS includes resident mappings; anonymous memory isolates resident allocations. These are different counters.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">CPU core-s median (range)</th>
+<th scope="col" class="num">Peak anonymous MiB, median / max</th>
+<th scope="col" class="num">Peak RSS MiB, median / max</th>
+<th scope="col" class="num">Peak charged MiB, median / max</th>
+<th scope="col" class="num">Peak working MiB, median / max</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td class="num">30.05 (29.02–46.05)</td>
+<td class="num">39.36 / 97.45</td>
+<td class="num">73.36 / 160.53</td>
+<td class="num">1,536.04 / 1,536.62</td>
+<td class="num">89.14 / 138.90</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td class="num">26.04 (24.23–132.79)</td>
+<td class="num">83.61 / 130.16</td>
+<td class="num">157.32 / 1,504.23</td>
+<td class="num">103.76 / 1,537.56</td>
+<td class="num">90.26 / 1,420.68</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td class="num">45.81 (30.38–62.30)</td>
+<td class="num">43.25 / 49.79</td>
+<td class="num">58.38 / 64.65</td>
+<td class="num">1,536.60 / 1,537.13</td>
+<td class="num">107.72 / 139.36</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td class="num">32.39 (28.00–45.31)</td>
+<td class="num">8.23 / 10.24</td>
+<td class="num">1,256.35 / 1,347.00</td>
+<td class="num">1,536.70 / 1,537.44</td>
+<td class="num">1,513.97 / 1,526.12</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num">35.71 (33.45–50.71)</td>
+<td class="num">19.84 / 19.92</td>
+<td class="num">32.53 / 32.61</td>
+<td class="num">1,536.11 / 1,537.28</td>
+<td class="num">108.01 / 177.68</td>
+</tr>
+<tr>
+<th scope="row">aria2</th>
+<td class="num">26.14 (5.04–30.12)</td>
+<td class="num">8.37 / 12.31</td>
+<td class="num">17.53 / 21.43</td>
+<td class="num">1,536.03 / 1,536.41</td>
+<td class="num">58.02 / 75.80</td>
+</tr>
+</tbody></table></div>
+<p><strong>Completed-download resource costs.</strong> The following subset excludes failed attempts, whose resources may cover discovery or only a small part of the ISO. Use this subset for loaded-download comparisons. Cells again show median / maximum sampled peak; CPU is a median.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">Verified downloads</th>
+<th scope="col" class="num">CPU core-s</th>
+<th scope="col" class="num">Peak anonymous MiB</th>
+<th scope="col" class="num">Peak RSS MiB</th>
+<th scope="col" class="num">Peak charged MiB</th>
+<th scope="col" class="num">Peak working MiB</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td class="num">6</td>
+<td class="num">30.05</td>
+<td class="num">39.36 / 97.45</td>
+<td class="num">73.36 / 160.53</td>
+<td class="num">1,536.04 / 1,536.62</td>
+<td class="num">89.14 / 138.90</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td class="num">2</td>
+<td class="num">123.83</td>
+<td class="num">122.42 / 130.16</td>
+<td class="num">1,498.72 / 1,504.23</td>
+<td class="num">1,537.03 / 1,537.56</td>
+<td class="num">1,311.69 / 1,420.68</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td class="num">5</td>
+<td class="num">43.35</td>
+<td class="num">44.56 / 49.79</td>
+<td class="num">59.43 / 64.65</td>
+<td class="num">1,536.64 / 1,537.13</td>
+<td class="num">110.88 / 139.36</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td class="num">6</td>
+<td class="num">32.39</td>
+<td class="num">8.23 / 10.24</td>
+<td class="num">1,256.35 / 1,347.00</td>
+<td class="num">1,536.70 / 1,537.44</td>
+<td class="num">1,513.97 / 1,526.12</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num">6</td>
+<td class="num">35.71</td>
+<td class="num">19.84 / 19.92</td>
+<td class="num">32.53 / 32.61</td>
+<td class="num">1,536.11 / 1,537.28</td>
+<td class="num">108.01 / 177.68</td>
+</tr>
+<tr>
+<th scope="row">aria2</th>
+<td class="num">5</td>
+<td class="num">26.73</td>
+<td class="num">9.41 / 12.31</td>
+<td class="num">18.50 / 21.43</td>
+<td class="num">1,536.05 / 1,536.41</td>
+<td class="num">58.89 / 75.80</td>
+</tr>
+</tbody></table></div>
+<p><strong>Discovery and observation quality.</strong> Startup/active rates are omitted for rqbit and rTorrent because their counters can include initialization or hash-scan work. A dash also denotes unavailable address-family counters (not captured for rqbit). Peer maxima are sampled address counts from native APIs, with different client semantics, not unique-peer totals or a normalized capacity measure. Sampling intervals are median / maximum seconds; resource peaks can miss brief spikes, especially during the longer gaps.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">First payload s (valid n)</th>
+<th scope="col" class="num">Active 10–90% MiB/s (valid n)</th>
+<th scope="col" class="num">Max observed IPv4 peers</th>
+<th scope="col" class="num">Max observed IPv6 peers</th>
+<th scope="col" class="num">Resource interval s</th>
+<th scope="col" class="num">Status interval s</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">qBittorrent</th>
+<td class="num">3.39 (6)</td>
+<td class="num">44.14 (6)</td>
+<td class="num">98</td>
+<td class="num">12</td>
+<td class="num">1.123 / 5.766</td>
+<td class="num">0.202 / 0.250</td>
+</tr>
+<tr>
+<th scope="row">Deluge</th>
+<td class="num">2.57 (2)</td>
+<td class="num">12.38 (2)</td>
+<td class="num">99</td>
+<td class="num">0</td>
+<td class="num">0.530 / 4.398</td>
+<td class="num">0.211 / 0.294</td>
+</tr>
+<tr>
+<th scope="row">Transmission</th>
+<td class="num">31.28 (5)</td>
+<td class="num">34.57 (5)</td>
+<td class="num">100</td>
+<td class="num">15</td>
+<td class="num">0.528 / 15.242</td>
+<td class="num">0.204 / 1.955</td>
+</tr>
+<tr>
+<th scope="row">rTorrent</th>
+<td class="num">— (0)</td>
+<td class="num">— (0)</td>
+<td class="num">42</td>
+<td class="num">23</td>
+<td class="num">0.525 / 0.559</td>
+<td class="num">0.204 / 0.429</td>
+</tr>
+<tr>
+<th scope="row">rqbit</th>
+<td class="num">— (0)</td>
+<td class="num">— (0)</td>
+<td class="num">—</td>
+<td class="num">—</td>
+<td class="num">1.063 / 13.778</td>
+<td class="num">0.202 / 0.299</td>
+</tr>
+<tr>
+<th scope="row">aria2</th>
+<td class="num">6.77 (5)</td>
+<td class="num">70.30 (5)</td>
+<td class="num">18</td>
+<td class="num">9</td>
+<td class="num">0.528 / 0.565</td>
+<td class="num">0.208 / 0.741</td>
+</tr>
+</tbody></table></div>
+<p><strong>Every registered attempt, in execution order.</strong> Network receive bytes include BitTorrent and control/protocol traffic. The complete-file rate is absent on failure. CPU and sampled memory peaks describe that attempt; the sample count makes uneven resource observation visible.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col" class="num">Slot</th>
+<th scope="col" class="num">Round</th>
+<th scope="col">Client</th>
+<th scope="col">Result</th>
+<th scope="col" class="num">Seconds</th>
+<th scope="col" class="num">MiB/s</th>
+<th scope="col" class="num">Received MiB</th>
+<th scope="col" class="num">CPU core-s</th>
+<th scope="col" class="num">Peak anonymous MiB</th>
+<th scope="col" class="num">Peak RSS MiB</th>
+<th scope="col" class="num">Peak charged MiB</th>
+<th scope="col" class="num">Samples</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row" class="num">1</th>
+<td class="num">1</td>
+<td>aria2</td>
+<td>ok</td>
+<td class="num">86.23</td>
+<td class="num">32.38</td>
+<td class="num">2,842.27</td>
+<td class="num">27.09</td>
+<td class="num">6.03</td>
+<td class="num">15.25</td>
+<td class="num">1,536.00</td>
+<td class="num">167</td>
+</tr>
+<tr>
+<th scope="row" class="num">2</th>
+<td class="num">1</td>
+<td>rqbit</td>
+<td>ok</td>
+<td class="num">80.58</td>
+<td class="num">34.65</td>
+<td class="num">3,245.21</td>
+<td class="num">45.32</td>
+<td class="num">19.86</td>
+<td class="num">32.54</td>
+<td class="num">1,536.13</td>
+<td class="num">35</td>
+</tr>
+<tr>
+<th scope="row" class="num">3</th>
+<td class="num">1</td>
+<td>Transmission</td>
+<td>ok</td>
+<td class="num">200.48</td>
+<td class="num">13.93</td>
+<td class="num">3,035.83</td>
+<td class="num">51.77</td>
+<td class="num">37.30</td>
+<td class="num">53.16</td>
+<td class="num">1,536.55</td>
+<td class="num">223</td>
+</tr>
+<tr>
+<th scope="row" class="num">4</th>
+<td class="num">1</td>
+<td>Deluge</td>
+<td>ok</td>
+<td class="num">249.22</td>
+<td class="num">11.20</td>
+<td class="num">2,989.81</td>
+<td class="num">132.79</td>
+<td class="num">130.16</td>
+<td class="num">1,493.22</td>
+<td class="num">1,537.56</td>
+<td class="num">261</td>
+</tr>
+<tr>
+<th scope="row" class="num">5</th>
+<td class="num">1</td>
+<td>rTorrent</td>
+<td>ok</td>
+<td class="num">47.36</td>
+<td class="num">58.95</td>
+<td class="num">2,987.09</td>
+<td class="num">45.31</td>
+<td class="num">8.27</td>
+<td class="num">1,224.78</td>
+<td class="num">1,537.15</td>
+<td class="num">91</td>
+</tr>
+<tr>
+<th scope="row" class="num">6</th>
+<td class="num">1</td>
+<td>qBittorrent</td>
+<td>ok</td>
+<td class="num">105.85</td>
+<td class="num">26.38</td>
+<td class="num">2,881.18</td>
+<td class="num">46.05</td>
+<td class="num">40.24</td>
+<td class="num">77.56</td>
+<td class="num">1,536.20</td>
+<td class="num">48</td>
+</tr>
+<tr>
+<th scope="row" class="num">7</th>
+<td class="num">2</td>
+<td>rqbit</td>
+<td>ok</td>
+<td class="num">93.81</td>
+<td class="num">29.76</td>
+<td class="num">3,179.56</td>
+<td class="num">50.71</td>
+<td class="num">19.83</td>
+<td class="num">32.52</td>
+<td class="num">1,536.07</td>
+<td class="num">36</td>
+</tr>
+<tr>
+<th scope="row" class="num">8</th>
+<td class="num">2</td>
+<td>Deluge</td>
+<td>timeout</td>
+<td class="num">900.08</td>
+<td class="num">—</td>
+<td class="num">30.71</td>
+<td class="num">26.71</td>
+<td class="num">83.80</td>
+<td class="num">170.68</td>
+<td class="num">117.40</td>
+<td class="num">1707</td>
+</tr>
+<tr>
+<th scope="row" class="num">9</th>
+<td class="num">2</td>
+<td>aria2</td>
+<td>timeout</td>
+<td class="num">900.15</td>
+<td class="num">—</td>
+<td class="num">40.81</td>
+<td class="num">5.04</td>
+<td class="num">5.64</td>
+<td class="num">14.70</td>
+<td class="num">42.49</td>
+<td class="num">1701</td>
+</tr>
+<tr>
+<th scope="row" class="num">10</th>
+<td class="num">2</td>
+<td>qBittorrent</td>
+<td>ok</td>
+<td class="num">71.72</td>
+<td class="num">38.93</td>
+<td class="num">2,878.70</td>
+<td class="num">29.70</td>
+<td class="num">97.45</td>
+<td class="num">160.53</td>
+<td class="num">1,536.05</td>
+<td class="num">66</td>
+</tr>
+<tr>
+<th scope="row" class="num">11</th>
+<td class="num">2</td>
+<td>Transmission</td>
+<td>ok</td>
+<td class="num">182.60</td>
+<td class="num">15.29</td>
+<td class="num">3,014.47</td>
+<td class="num">43.35</td>
+<td class="num">49.79</td>
+<td class="num">64.65</td>
+<td class="num">1,536.76</td>
+<td class="num">223</td>
+</tr>
+<tr>
+<th scope="row" class="num">12</th>
+<td class="num">2</td>
+<td>rTorrent</td>
+<td>ok</td>
+<td class="num">72.71</td>
+<td class="num">38.40</td>
+<td class="num">2,941.80</td>
+<td class="num">34.50</td>
+<td class="num">8.64</td>
+<td class="num">1,225.43</td>
+<td class="num">1,536.84</td>
+<td class="num">139</td>
+</tr>
+<tr>
+<th scope="row" class="num">13</th>
+<td class="num">3</td>
+<td>rTorrent</td>
+<td>ok</td>
+<td class="num">72.77</td>
+<td class="num">38.37</td>
+<td class="num">2,922.64</td>
+<td class="num">31.03</td>
+<td class="num">7.51</td>
+<td class="num">1,267.33</td>
+<td class="num">1,536.56</td>
+<td class="num">140</td>
+</tr>
+<tr>
+<th scope="row" class="num">14</th>
+<td class="num">3</td>
+<td>Transmission</td>
+<td>timeout</td>
+<td class="num">900.16</td>
+<td class="num">—</td>
+<td class="num">3,005.46</td>
+<td class="num">62.30</td>
+<td class="num">41.94</td>
+<td class="num">57.34</td>
+<td class="num">1,536.45</td>
+<td class="num">1557</td>
+</tr>
+<tr>
+<th scope="row" class="num">15</th>
+<td class="num">3</td>
+<td>qBittorrent</td>
+<td>ok</td>
+<td class="num">85.08</td>
+<td class="num">32.82</td>
+<td class="num">2,879.16</td>
+<td class="num">29.91</td>
+<td class="num">35.21</td>
+<td class="num">65.72</td>
+<td class="num">1,535.99</td>
+<td class="num">44</td>
+</tr>
+<tr>
+<th scope="row" class="num">16</th>
+<td class="num">3</td>
+<td>aria2</td>
+<td>ok</td>
+<td class="num">102.79</td>
+<td class="num">27.16</td>
+<td class="num">2,892.47</td>
+<td class="num">30.12</td>
+<td class="num">12.31</td>
+<td class="num">21.43</td>
+<td class="num">1,536.41</td>
+<td class="num">199</td>
+</tr>
+<tr>
+<th scope="row" class="num">17</th>
+<td class="num">3</td>
+<td>Deluge</td>
+<td>timeout</td>
+<td class="num">900.03</td>
+<td class="num">—</td>
+<td class="num">3.58</td>
+<td class="num">25.36</td>
+<td class="num">81.64</td>
+<td class="num">142.41</td>
+<td class="num">88.54</td>
+<td class="num">1701</td>
+</tr>
+<tr>
+<th scope="row" class="num">18</th>
+<td class="num">3</td>
+<td>rqbit</td>
+<td>ok</td>
+<td class="num">73.82</td>
+<td class="num">37.83</td>
+<td class="num">3,103.25</td>
+<td class="num">33.45</td>
+<td class="num">19.92</td>
+<td class="num">32.61</td>
+<td class="num">1,536.08</td>
+<td class="num">43</td>
+</tr>
+<tr>
+<th scope="row" class="num">19</th>
+<td class="num">4</td>
+<td>Transmission</td>
+<td>ok</td>
+<td class="num">113.55</td>
+<td class="num">24.59</td>
+<td class="num">2,908.27</td>
+<td class="num">30.38</td>
+<td class="num">29.14</td>
+<td class="num">44.14</td>
+<td class="num">1,536.64</td>
+<td class="num">218</td>
+</tr>
+<tr>
+<th scope="row" class="num">20</th>
+<td class="num">4</td>
+<td>aria2</td>
+<td>ok</td>
+<td class="num">44.20</td>
+<td class="num">63.18</td>
+<td class="num">2,892.27</td>
+<td class="num">26.73</td>
+<td class="num">11.02</td>
+<td class="num">20.05</td>
+<td class="num">1,536.12</td>
+<td class="num">86</td>
+</tr>
+<tr>
+<th scope="row" class="num">21</th>
+<td class="num">4</td>
+<td>rTorrent</td>
+<td>ok</td>
+<td class="num">63.78</td>
+<td class="num">43.78</td>
+<td class="num">2,883.56</td>
+<td class="num">33.75</td>
+<td class="num">10.24</td>
+<td class="num">1,347.00</td>
+<td class="num">1,537.44</td>
+<td class="num">123</td>
+</tr>
+<tr>
+<th scope="row" class="num">22</th>
+<td class="num">4</td>
+<td>rqbit</td>
+<td>ok</td>
+<td class="num">76.61</td>
+<td class="num">36.45</td>
+<td class="num">3,228.88</td>
+<td class="num">35.79</td>
+<td class="num">19.52</td>
+<td class="num">32.21</td>
+<td class="num">1,536.04</td>
+<td class="num">32</td>
+</tr>
+<tr>
+<th scope="row" class="num">23</th>
+<td class="num">4</td>
+<td>qBittorrent</td>
+<td>ok</td>
+<td class="num">91.25</td>
+<td class="num">30.60</td>
+<td class="num">2,871.34</td>
+<td class="num">30.19</td>
+<td class="num">37.49</td>
+<td class="num">67.32</td>
+<td class="num">1,536.03</td>
+<td class="num">43</td>
+</tr>
+<tr>
+<th scope="row" class="num">24</th>
+<td class="num">4</td>
+<td>Deluge</td>
+<td>ok</td>
+<td class="num">245.77</td>
+<td class="num">11.36</td>
+<td class="num">3,045.96</td>
+<td class="num">114.86</td>
+<td class="num">114.68</td>
+<td class="num">1,504.23</td>
+<td class="num">1,536.50</td>
+<td class="num">178</td>
+</tr>
+<tr>
+<th scope="row" class="num">25</th>
+<td class="num">5</td>
+<td>qBittorrent</td>
+<td>ok</td>
+<td class="num">119.62</td>
+<td class="num">23.34</td>
+<td class="num">2,895.69</td>
+<td class="num">36.44</td>
+<td class="num">47.09</td>
+<td class="num">77.56</td>
+<td class="num">1,536.62</td>
+<td class="num">73</td>
+</tr>
+<tr>
+<th scope="row" class="num">26</th>
+<td class="num">5</td>
+<td>rTorrent</td>
+<td>ok</td>
+<td class="num">73.16</td>
+<td class="num">38.17</td>
+<td class="num">2,869.06</td>
+<td class="num">30.67</td>
+<td class="num">8.19</td>
+<td class="num">1,245.37</td>
+<td class="num">1,536.21</td>
+<td class="num">141</td>
+</tr>
+<tr>
+<th scope="row" class="num">27</th>
+<td class="num">5</td>
+<td>Deluge</td>
+<td>timeout</td>
+<td class="num">900.19</td>
+<td class="num">—</td>
+<td class="num">3.57</td>
+<td class="num">24.38</td>
+<td class="num">83.43</td>
+<td class="num">143.97</td>
+<td class="num">90.12</td>
+<td class="num">1698</td>
+</tr>
+<tr>
+<th scope="row" class="num">28</th>
+<td class="num">5</td>
+<td>Transmission</td>
+<td>ok</td>
+<td class="num">347.72</td>
+<td class="num">8.03</td>
+<td class="num">3,030.92</td>
+<td class="num">48.28</td>
+<td class="num">44.56</td>
+<td class="num">59.43</td>
+<td class="num">1,536.54</td>
+<td class="num">498</td>
+</tr>
+<tr>
+<th scope="row" class="num">29</th>
+<td class="num">5</td>
+<td>rqbit</td>
+<td>ok</td>
+<td class="num">81.39</td>
+<td class="num">34.31</td>
+<td class="num">3,197.98</td>
+<td class="num">35.64</td>
+<td class="num">19.87</td>
+<td class="num">32.55</td>
+<td class="num">1,536.20</td>
+<td class="num">36</td>
+</tr>
+<tr>
+<th scope="row" class="num">30</th>
+<td class="num">5</td>
+<td>aria2</td>
+<td>ok</td>
+<td class="num">32.85</td>
+<td class="num">84.99</td>
+<td class="num">2,842.10</td>
+<td class="num">22.51</td>
+<td class="num">7.33</td>
+<td class="num">16.55</td>
+<td class="num">1,536.05</td>
+<td class="num">64</td>
+</tr>
+<tr>
+<th scope="row" class="num">31</th>
+<td class="num">6</td>
+<td>Deluge</td>
+<td>timeout</td>
+<td class="num">900.21</td>
+<td class="num">—</td>
+<td class="num">3.59</td>
+<td class="num">24.23</td>
+<td class="num">82.16</td>
+<td class="num">142.56</td>
+<td class="num">88.82</td>
+<td class="num">1699</td>
+</tr>
+<tr>
+<th scope="row" class="num">32</th>
+<td class="num">6</td>
+<td>qBittorrent</td>
+<td>ok</td>
+<td class="num">76.16</td>
+<td class="num">36.66</td>
+<td class="num">2,878.53</td>
+<td class="num">29.02</td>
+<td class="num">38.48</td>
+<td class="num">69.16</td>
+<td class="num">1,535.98</td>
+<td class="num">51</td>
+</tr>
+<tr>
+<th scope="row" class="num">33</th>
+<td class="num">6</td>
+<td>rqbit</td>
+<td>ok</td>
+<td class="num">77.12</td>
+<td class="num">36.20</td>
+<td class="num">3,099.69</td>
+<td class="num">33.55</td>
+<td class="num">19.68</td>
+<td class="num">32.37</td>
+<td class="num">1,537.28</td>
+<td class="num">26</td>
+</tr>
+<tr>
+<th scope="row" class="num">34</th>
+<td class="num">6</td>
+<td>rTorrent</td>
+<td>ok</td>
+<td class="num">50.27</td>
+<td class="num">55.55</td>
+<td class="num">2,895.48</td>
+<td class="num">28.00</td>
+<td class="num">6.48</td>
+<td class="num">1,329.41</td>
+<td class="num">1,535.96</td>
+<td class="num">98</td>
+</tr>
+<tr>
+<th scope="row" class="num">35</th>
+<td class="num">6</td>
+<td>aria2</td>
+<td>ok</td>
+<td class="num">289.25</td>
+<td class="num">9.65</td>
+<td class="num">2,864.94</td>
+<td class="num">25.55</td>
+<td class="num">9.41</td>
+<td class="num">18.50</td>
+<td class="num">1,535.99</td>
+<td class="num">550</td>
+</tr>
+<tr>
+<th scope="row" class="num">36</th>
+<td class="num">6</td>
+<td>Transmission</td>
+<td>ok</td>
+<td class="num">192.27</td>
+<td class="num">14.52</td>
+<td class="num">2,963.88</td>
+<td class="num">42.67</td>
+<td class="num">45.30</td>
+<td class="num">61.07</td>
+<td class="num">1,537.13</td>
+<td class="num">243</td>
+</tr>
+</tbody></table></div>
+<p>Audit: 36 attempts; 30 independent SHA-256 checks; 14,238 resource samples; 920 sanitized Ethernet/route observations. No ISO retained.</p>
+<p>This experiment describes cold client state on this host, network, and swarm during the recorded window. It does not estimate universal client capacity. Six trials still have substantial uncertainty; even 6/6 completions gives a Wilson lower bound of about 61%, under a binomial model. Swarm and temporal dependence further limit that model. There are no significance claims.</p>
+<p><strong>What the memory figures mean.</strong> Among completed downloads, rTorrent&#x27;s median peak anonymous allocation was only <strong>8.23 MiB</strong>, but its median peak RSS was <strong>1,256.35 MiB</strong> and working usage <strong>1,513.97 MiB</strong> because file mappings/cache are substantial. It cannot be described as an 8 MiB-RAM client. rqbit combined a 19.84 MiB median anonymous peak with 32.53 MiB RSS; aria2&#x27;s corresponding values were 9.41 and 18.50 MiB across five completions. qBittorrent reached 39.36/73.36 MiB and Transmission 44.56/59.43 MiB. Deluge&#x27;s two completions reached 122.42/1,498.72 MiB. Anonymous memory excludes file-backed pages; RSS sums resident process mappings and may double-count shared pages. Charged memory includes filesystem cache; working usage subtracts inactive file pages. These counters describe different costs, not minimum RAM requirements.</p>
+<p>Every completed transfer approached the configured 1,536 MiB charged limit, mostly through filesystem cache. Small sampled overshoots are allowed temporarily by the <a href="https://docs.kernel.org/admin-guide/cgroup-v2.html#memory-interface-files">Linux cgroup memory controller</a>. No accepted main attempt was OOM-killed. CPU core-seconds are cumulative cgroup CPU usage, not elapsed seconds or CPU percentage; idle timeouts can consume less CPU than a complete transfer. That is why both all-attempt and completed-download resource tables are included.</p>
+<p><strong>Observation limits.</strong> Resource polling targeted 0.5 seconds, status polling 0.2 seconds, and optional discovery polling 15 seconds. Actual resource gaps differed by client: the largest was <strong>15.242 seconds</strong>, and rqbit&#x27;s was 13.778 seconds. The cadence table makes this visible. Sampled peaks are lower bounds on transient peaks; small memory differences should not be treated as precise rankings. Cumulative CPU and network deltas do not lose work between samples. All peak/median resource values and cumulative deltas were independently recomputed from the 14,238 raw samples. No optional diagnostic RPC errors occurred in the main experiment. Startup/active-window diagnostics are suppressed for rTorrent and rqbit because initialization/hash-scan counters can resemble transferred payload. Their complete-file wall rates, network RX, and filesystem verification remain valid.</p>
+<p><strong>Disk handling and integrity.</strong> The 30 verified main downloads total <strong>81.80 GiB</strong> of ISO payload, demonstrating repeated actual transfers rather than reuse of a preexisting ISO. Each successful attempt&#x27;s measured network receive count exceeds the full payload. Each attempt deleted the ISO and sidecars and recorded an empty scratch directory: 36/36 cleanups. The clients share one scratch volume, so at most one 2.73 GiB ISO payload is present at a time. The project removes its containers and volumes on exit; <strong>no ISO is retained</strong>. This is a payload-retention limit, not a cap on Docker&#x27;s overall image/VM disk allocation. The independent expected SHA-256 from <a href="https://releases.ubuntu.com/26.04/SHA256SUMS">Ubuntu&#x27;s SHA256SUMS</a> is <code>cc8a95cde20f6ced61a322420de00f10cc3c90ced545daa46cb9c1a117f1d927</code>.</p>
+<p><strong>Interpretation.</strong> This is a real public-swarm experiment on one connection in one time window, with controlled image versions, resource limits, payload, cold application state, and balanced order. Peer availability, tracker responses, DHT bootstrap, endgame behavior, and ISP conditions remain uncontrolled. The balance mitigates time/order effects; it cannot eliminate them or establish independent, stationary observations. The <a href="https://github.com/canonical/ubuntu.com/issues/15735">reported Ubuntu IPv4 tracker problem</a> is relevant context, but does not prove the cause of any individual failure. The earlier rTorrent/aria2 IPv4-only failures do not demonstrate low transfer capacity: both downloaded the complete ISO in this dual-stack main experiment. Nor does aria2&#x27;s fastest 84.99 MiB/s observation establish a stable maximum. These findings describe the tested cold-start deployment, not an already connected client or every network.</p>
+<p><strong>Separate Deluge interface follow-up.</strong> The <a href="results/ubuntu-six-runs/followup-plan.json">conditional follow-up plan</a> was recorded at 21:10 UTC, before the main experiment finished. Its trigger was fewer than three Deluge completions in the fixed six main attempts; the <a href="results/ubuntu-six-runs/followup-decision.json">decision</a> records the actual 2/6. It fixes another six attempts under the same deadline and quotas, changing one client preference: <code>listen_interface</code> binds to the Linux interface carrying the default outgoing route. A paused, untimed preflight verifies IPv4 and IPv6 TCP/UDP sockets before transfers. Binding that interface changes both interface selection and address-family availability; this is not an isolated proof of IPv6 causality. It runs later and remains a separate condition, never pooled into or substituted for the native 36 attempts.</p>
+<p>The first interface follow-up exposed an observer defect: optional discovery RPCs timed out and blocked synchronous completion polling. Its recorded completed downloads and interrupted attempt are preserved as an <a href="results/runs/ubuntu-deluge-interface-observer-diagnostic/invalidated.json">excluded diagnostic run</a>, with original samples and traceback. Before starting a new fixed six-attempt series, the observer was amended to skip these optional RPCs for this profile. Basic status polling, resource collection, the fixed deadline, and client settings were otherwise retained. Discovery RPC suppression affects observation only; it does not disable peer discovery. The <a href="results/ubuntu-deluge-ipv6/study.json">follow-up study record</a> records this amendment in advance. The audit rejects optional RPC errors in any performance cohort. The main experiment had zero such errors and is unchanged.</p>
+<p><strong>Follow-up findings: six more verified downloads, reported separately.</strong> This series ran from <strong>22:18:30 to 22:36:26 UTC</strong> on 2026-11-03. Deluge completed <strong>6/6</strong>, with <strong>17.31 MiB/s median</strong>, <strong>15.60–19.40 MiB/s IQR</strong>, and <strong>11.28–20.78 MiB/s range</strong>. Median completion time was 161.99 seconds. Median CPU cost was 70.39 core-seconds; median sampled anonymous/RSS peaks were <strong>155.56 / 1,493.55 MiB</strong>. These are loaded measurements across six full transfers, alongside the original native-profile results rather than replacing them.</p>
+<p>The later interface profile completed more consistently in this window, but the changed binding, later swarm conditions, and observer amendment prevent attributing the difference solely to IPv6. The untimed preflight proves socket availability, not which address family supplied the payload. Docker renamed the outgoing interface between fresh starts (<code>eth0</code>/<code>eth1</code>); the archived init script detects the default route each time, and every effective setting records that selected interface. The <a href="results/ubuntu-deluge-ipv6/observations.json">interface observation</a> explains why the preflight&#x27;s literal interface name is not held fixed.</p>
+<p>Six registered attempts per client, 6 total; a fixed 900-second deadline, without an early stall cutoff. Median, interquartile range (IQR), and full range describe completed, SHA-256 verified downloads. Every failure remains in the completion count and receives 900 seconds in the penalized mean. Inclusive quartiles use linear interpolation at rank (n−1)×p. Speed and duration medians are computed separately from per-attempt values.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">Completed</th>
+<th scope="col" class="num">Wilson 95% completion interval</th>
+<th scope="col" class="num">Median MiB/s</th>
+<th scope="col" class="num">IQR MiB/s</th>
+<th scope="col" class="num">Range MiB/s</th>
+<th scope="col" class="num">Median seconds</th>
+<th scope="col" class="num">Mean penalized seconds</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">Deluge interface</th>
+<td class="num">6/6</td>
+<td class="num">61.0%–100.0%</td>
+<td class="num">17.31</td>
+<td class="num">15.60–19.40</td>
+<td class="num">11.28–20.78</td>
+<td class="num">161.99</td>
+<td class="num">171.49</td>
+</tr>
+</tbody></table></div>
+<p><strong>Completed-download resource costs.</strong> The following subset excludes failed attempts, whose resources may cover discovery or only a small part of the ISO. Use this subset for loaded-download comparisons. Cells again show median / maximum sampled peak; CPU is a median.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">Verified downloads</th>
+<th scope="col" class="num">CPU core-s</th>
+<th scope="col" class="num">Peak anonymous MiB</th>
+<th scope="col" class="num">Peak RSS MiB</th>
+<th scope="col" class="num">Peak charged MiB</th>
+<th scope="col" class="num">Peak working MiB</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">Deluge interface</th>
+<td class="num">6</td>
+<td class="num">70.39</td>
+<td class="num">155.56 / 179.88</td>
+<td class="num">1,493.55 / 1,520.41</td>
+<td class="num">1,537.09 / 1,540.48</td>
+<td class="num">1,396.60 / 1,435.78</td>
+</tr>
+</tbody></table></div>
+<p><strong>Follow-up observation quality.</strong> Peer-family/discovery counters were intentionally not collected; a dash is not zero IPv6 traffic. Startup/active diagnostics below use basic status polling. Resource intervals are median / maximum, and peaks remain sampled lower bounds.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col">Client</th>
+<th scope="col" class="num">First payload s (valid n)</th>
+<th scope="col" class="num">Active 10–90% MiB/s (valid n)</th>
+<th scope="col" class="num">Max observed IPv4 peers</th>
+<th scope="col" class="num">Max observed IPv6 peers</th>
+<th scope="col" class="num">Resource interval s</th>
+<th scope="col" class="num">Status interval s</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row">Deluge interface</th>
+<td class="num">5.04 (6)</td>
+<td class="num">19.64 (6)</td>
+<td class="num">—</td>
+<td class="num">—</td>
+<td class="num">0.528 / 8.075</td>
+<td class="num">0.204 / 0.255</td>
+</tr>
+</tbody></table></div>
+<p><strong>Every registered attempt, in execution order.</strong> Network receive bytes include BitTorrent and control/protocol traffic. The complete-file rate is absent on failure. CPU and sampled memory peaks describe that attempt; the sample count makes uneven resource observation visible.</p>
+<div class="table-scroll" role="region" tabindex="0" aria-label="Ubuntu public download"><table><caption class="sr-only">Ubuntu public download</caption><thead><tr>
+<th scope="col" class="num">Slot</th>
+<th scope="col" class="num">Round</th>
+<th scope="col">Client</th>
+<th scope="col">Result</th>
+<th scope="col" class="num">Seconds</th>
+<th scope="col" class="num">MiB/s</th>
+<th scope="col" class="num">Received MiB</th>
+<th scope="col" class="num">CPU core-s</th>
+<th scope="col" class="num">Peak anonymous MiB</th>
+<th scope="col" class="num">Peak RSS MiB</th>
+<th scope="col" class="num">Peak charged MiB</th>
+<th scope="col" class="num">Samples</th>
+</tr></thead><tbody>
+<tr>
+<th scope="row" class="num">1</th>
+<td class="num">1</td>
+<td>Deluge interface</td>
+<td>ok</td>
+<td class="num">181.33</td>
+<td class="num">15.40</td>
+<td class="num">3,033.69</td>
+<td class="num">85.76</td>
+<td class="num">136.95</td>
+<td class="num">1,445.54</td>
+<td class="num">1,537.11</td>
+<td class="num">318</td>
+</tr>
+<tr>
+<th scope="row" class="num">2</th>
+<td class="num">2</td>
+<td>Deluge interface</td>
+<td>ok</td>
+<td class="num">141.62</td>
+<td class="num">19.72</td>
+<td class="num">2,947.97</td>
+<td class="num">63.81</td>
+<td class="num">160.29</td>
+<td class="num">1,452.12</td>
+<td class="num">1,536.94</td>
+<td class="num">135</td>
+</tr>
+<tr>
+<th scope="row" class="num">3</th>
+<td class="num">3</td>
+<td>Deluge interface</td>
+<td>ok</td>
+<td class="num">134.36</td>
+<td class="num">20.78</td>
+<td class="num">2,935.09</td>
+<td class="num">65.05</td>
+<td class="num">158.96</td>
+<td class="num">1,520.41</td>
+<td class="num">1,536.01</td>
+<td class="num">87</td>
+</tr>
+<tr>
+<th scope="row" class="num">4</th>
+<td class="num">4</td>
+<td>Deluge interface</td>
+<td>ok</td>
+<td class="num">247.65</td>
+<td class="num">11.28</td>
+<td class="num">3,030.57</td>
+<td class="num">98.23</td>
+<td class="num">145.07</td>
+<td class="num">1,507.91</td>
+<td class="num">1,537.07</td>
+<td class="num">297</td>
+</tr>
+<tr>
+<th scope="row" class="num">5</th>
+<td class="num">5</td>
+<td>Deluge interface</td>
+<td>ok</td>
+<td class="num">151.46</td>
+<td class="num">18.44</td>
+<td class="num">2,960.06</td>
+<td class="num">61.21</td>
+<td class="num">152.15</td>
+<td class="num">1,507.68</td>
+<td class="num">1,540.48</td>
+<td class="num">152</td>
+</tr>
+<tr>
+<th scope="row" class="num">6</th>
+<td class="num">6</td>
+<td>Deluge interface</td>
+<td>ok</td>
+<td class="num">172.52</td>
+<td class="num">16.18</td>
+<td class="num">3,001.49</td>
+<td class="num">75.74</td>
+<td class="num">179.88</td>
+<td class="num">1,479.43</td>
+<td class="num">1,537.15</td>
+<td class="num">291</td>
+</tr>
+</tbody></table></div>
+<p>Audit: 6 attempts; 6 independent SHA-256 checks; 1,280 resource samples; 112 sanitized Ethernet/route observations. No ISO retained.</p>
+<p>This experiment describes cold client state on this host, network, and swarm during the recorded window. It does not estimate universal client capacity. Six trials still have substantial uncertainty; even 6/6 completions gives a Wilson lower bound of about 61%, under a binomial model. Swarm and temporal dependence further limit that model. There are no significance claims.</p>
+<p>The <a href="results/ubuntu-deluge-ipv6/validation.json">separate follow-up audit</a>, <a href="results/ubuntu-deluge-ipv6/analysis.json">analysis</a>, <a href="results/ubuntu-deluge-ipv6/attempts.csv">every follow-up observation CSV</a>, <a href="results/ubuntu-deluge-ipv6/trials.json">trial records</a>, and <a href="results/ubuntu-deluge-ipv6/samples.jsonl.gz">compressed resource samples</a> retain this condition&#x27;s evidence. All 112 follow-up Ethernet observations passed; all six payloads were deleted and project volumes removed. Across the main experiment and this valid follow-up, <strong>42 attempts produced 36 independently verified downloads, 98.16 GiB of verified ISO payload, and 15,518 resource samples</strong>. Excluded diagnostic runs and older pilots are additional evidence, outside those totals.</p>
+<p><strong>Evidence and reproduction.</strong> The <a href="results/ubuntu-six-runs/analysis.json">full analysis</a>, <a href="results/ubuntu-six-runs/attempts.csv">all observations CSV</a>, <a href="results/ubuntu-six-runs/trials.json">trial records</a>, <a href="results/ubuntu-six-runs/samples.jsonl.gz">compressed resource time series</a>, <a href="results/ubuntu-six-runs/host-link.jsonl">Ethernet monitor</a>, <a href="results/ubuntu-six-runs/harness/ubuntu_run.py">frozen harness</a>, and <a href="results/ubuntu-six-runs/validation.json">validation audit</a> retain the measurements and hashes. The audit verifies the planned slots/order, payload, SHA-256 checks, fresh effective settings, image/resource conditions, all resource aggregates, cleanup, and monitor coverage. See the <a href="README.md#public-ubuntu-fresh-downloads">README reproduction commands</a>, including the separate link monitor. The public workload, torrent metadata, and harness are reproducible; the same Internet swarm conditions and numerical speeds are not.</p>
+<p><strong>Historical pilots, excluded from these estimates.</strong> The earlier <a href="results/ubuntu-public/summary.csv">IPv4-only one-attempt snapshot</a>, <a href="results/ubuntu-public/selection.json">selection record</a>, <a href="results/runs/ubuntu-initial-diagnostic/interrupted.json">initial interrupted diagnostic</a>, and <a href="results/runs/ubuntu-dualstack-pilot/trials.json">two-client dual-stack smoke test</a> remain available. They used different setup/stopping rules and are not repetitions of the registered main experiment. Keeping them separate avoids choosing whichever attempt looked fastest. The synthetic comparison below remains its original three repetitions per client.</p></section>
+<section id="versions-and-conditions" aria-labelledby="heading-versions-and-conditions"><div class="section-heading"><span class="section-number">02</span><h2 id="heading-versions-and-conditions">Versions and conditions</h2></div><div class="table-scroll" role="region" tabindex="0" aria-label="Versions and conditions"><table><caption class="sr-only">Versions and conditions</caption><thead><tr>
 <th scope="col">Client</th>
 <th scope="col">Tested stable version</th>
 <th scope="col">Distribution</th>
@@ -61,8 +1030,8 @@
 </tr>
 </tbody></table></div>
 <p>Stable releases were checked against upstream sources and installed binaries. Prebuilt images are pinned by digest. rTorrent&#x27;s base, source checksums, and APK versions are pinned; a fresh locked build reproduced both measured binary hashes. <a href="README.md#images-and-provenance">Image references and primary sources</a> document the choices where an upstream image was unavailable. aria2&#x27;s base and runtime package versions are pinned too; its executable hash, package inventory, and build-version output are retained in <code>aria2/</code>.</p>
-<p>The host was Docker Desktop 29.9.2, Linuxkit 7.0.14, native ARM64, with 8 virtual CPUs and 7.75 GiB of VM memory. Each client had a <strong>2-core quota, 1,536 MiB charged-memory limit, and no swap</strong>. Only one client ran at a time. Two independent reference seeders supplied downloads; two separate leechers received uploads. Each reference process also had two cores and 1,536 MiB. Data lived in Linux Docker volumes. Deluge includes its normal web process; rTorrent has no ruTorrent front end. This compares the selected deployable images and their libraries.</p></section>
-<section id="transfer-results" aria-labelledby="heading-transfer-results"><div class="section-heading"><span class="section-number">02</span><h2 id="heading-transfer-results">Transfer results</h2></div><p><strong>Median MiB/s across three repetitions</strong>, from API submission through client completion. This includes discovery, initialization, transfer, and completion reporting. Downloads then underwent independent filesystem SHA-256 verification outside the timer. Uploads count 8 GiB total: 4 GiB received and piece-verified by each of two leechers.</p>
+<p>The host was Docker Desktop 29.9.2, Linuxkit 7.0.14, native ARM64, with 8 virtual CPUs and 7.75 GiB of VM memory. Each client had a <strong>2-core quota, 1,536 MiB charged-memory limit, and no swap</strong>. Only one client ran at a time. In the synthetic suite, two independent reference seeders supplied downloads; two separate leechers received uploads. Each reference process also had two cores and 1,536 MiB. Data lived in Linux Docker volumes. Deluge includes its normal web process; rTorrent has no ruTorrent front end. This compares the selected deployable images and their libraries.</p></section>
+<section id="transfer-results" aria-labelledby="heading-transfer-results"><div class="section-heading"><span class="section-number">03</span><h2 id="heading-transfer-results">Transfer results</h2></div><p><strong>Median MiB/s across three repetitions</strong>, from API submission through client completion. This includes discovery, initialization, transfer, and completion reporting. Downloads then underwent independent filesystem SHA-256 verification outside the timer. Uploads count 8 GiB total: 4 GiB received and piece-verified by each of two leechers.</p>
 <figure class="chart" aria-labelledby="chart-title">
 <div class="chart-top"><div><h3 id="chart-title">4 GiB download</h3><p id="chart-description">Median throughput and observed min–max, MiB/s. Higher is faster.</p></div>
 <div class="chart-control" id="chart-control" hidden><label for="workload">Compare workload</label><select id="workload"><option value="download-large">4 GiB download</option><option value="download-files">2,048 files</option><option value="download-concurrent">64 torrents</option><option value="download-shaped">32 MiB/s capped</option><option value="upload-2-peers">Two-peer upload</option></select></div></div>
@@ -137,7 +1106,7 @@
 <p>rTorrent&#x27;s upload took 84.93–88.18 seconds, with first verified payload at 60.43–61.22 seconds. Once transferring, its median 10–90% rate was <strong>337.5 MiB/s</strong>. Its poor overall upload rate here is largely a startup effect; the exact cause was not established. Transmission&#x27;s upload similarly improved from 242.6 MiB/s overall to 367.3 MiB/s in the active window.</p>
 <p>Among the five clients with retained capped-transfer diagnostics, active-window medians were approximately <strong>31.8–32.1 MiB/s</strong>. rTorrent&#x27;s diagnostic was suppressed because its progress counter reset. Overall rates differ mainly because a roughly 32-second transfer magnifies discovery/startup costs. The case caps the seeders&#x27; payload rate; it does not emulate WAN latency or packet loss.</p>
 <p>Some API progress counters reset during initialization/hash checking. Their startup/active-rate diagnostics are suppressed, including rqbit&#x27;s large-download diagnostics and rTorrent&#x27;s large/many-file/capped diagnostics. Raw samples remain available. Completed-payload wall rates do not depend on those counters&#x27; slope.</p></section>
-<section id="memory-and-cpu" aria-labelledby="heading-memory-and-cpu"><div class="section-heading"><span class="section-number">03</span><h2 id="heading-memory-and-cpu">Memory and CPU</h2></div><p>Memory below is <strong>MiB</strong>. Idle figures are medians of each repetition&#x27;s sampled median; peaks are the highest sample across all workloads and repetitions.</p>
+<section id="memory-and-cpu" aria-labelledby="heading-memory-and-cpu"><div class="section-heading"><span class="section-number">04</span><h2 id="heading-memory-and-cpu">Memory and CPU</h2></div><p>Memory below is <strong>MiB</strong>. Idle figures are medians of each repetition&#x27;s sampled median; peaks are the highest sample across all workloads and repetitions.</p>
 <div class="table-scroll" role="region" tabindex="0" aria-label="Memory and CPU"><table><caption class="sr-only">Memory and CPU</caption><thead><tr>
 <th scope="col">Client</th>
 <th scope="col" class="num">Empty idle RSS</th>
@@ -241,16 +1210,16 @@
 </tr>
 </tbody></table></div>
 <p>CPU values are median cgroup CPU consumption, not elapsed time: two busy cores for one second consume two core-seconds. Lower CPU can accompany slower transfers. Deluge&#x27;s large-download CPU cost was about three times qBittorrent&#x27;s. The cached rechecks measure hashing plus API/state transitions. rqbit has no force-recheck endpoint, so it forgets and re-adds existing files to invoke its initialization hash check. aria2 similarly removes and re-adds the existing file with <code>check-integrity=true</code>, after discarding its completion sidecar. Its median recheck took 12.34 seconds, versus 2.49–4.08 seconds for the other clients. Its default 16 MiB disk cache, <code>prealloc</code> allocation, disabled mmap, and 100-file open-file cache were retained. Every accepted recheck visibly entered checking. Catalog timings include the client&#x27;s API and initialization behavior, not just internal insertion speed. Fifteen-second idle windows do not test memory leaks.</p></section>
-<section id="validation-and-collection-history" aria-labelledby="heading-validation-and-collection-history"><div class="section-heading"><span class="section-number">04</span><h2 id="heading-validation-and-collection-history">Validation and collection history</h2></div><p>The <a href="results/comparison/validation.json">automated audit</a> confirms 72 downloaded workloads, 38,052 filesystem file checks, 18 observed rechecks, and 36 complete upload receivers. Selected payload totals are <strong>126 GiB downloaded and 144 GiB uploaded</strong>. Each client&#x27;s measured network RX/TX exceeds its respective complete payload. Upload leechers recorded zero uploaded payload, zero failed hash bytes, and full received payloads. The tracker excludes sibling leechers from each other&#x27;s discovery even after completion. There were no accepted timeouts.</p>
+<section id="validation-and-collection-history" aria-labelledby="heading-validation-and-collection-history"><div class="section-heading"><span class="section-number">05</span><h2 id="heading-validation-and-collection-history">Validation and collection history</h2></div><p>The <a href="results/comparison/validation.json">automated audit</a> confirms 72 downloaded workloads, 38,052 filesystem file checks, 18 observed rechecks, and 36 complete upload receivers. Selected payload totals are <strong>126 GiB downloaded and 144 GiB uploaded</strong>. Each client&#x27;s measured network RX/TX exceeds its respective complete payload. Upload leechers recorded zero uploaded payload, zero failed hash bytes, and full received payloads. The tracker excludes sibling leechers from each other&#x27;s discovery even after completion. There were no accepted timeouts.</p>
 <p>The first long run stopped when qBittorrent reported completion but immediate filesystem verification found a mismatch. After clean shutdown, all 2,048 files matched their expected hashes. This is consistent with deferred disk visibility; the exact cause was not established and no persistent corruption was observed. The harness now requires qBittorrent&#x27;s seed-ready state, retries and discloses transient verification failures, and fails persistent mismatches. Recheck monitoring also now requires observing checking rather than inferring work from CPU usage. <strong>Every baseline qBittorrent case was replaced with three complete new repetitions</strong>, all of which passed verification on the first attempt. The final Deluge repetition was completed separately. Unaffected baseline cases were retained without choosing the fastest results.</p>
 <p>aria2 contributed 30 phases and 45 GiB of payload in a separate three-repeat extension. All 12 downloads passed independent SHA-256 verification on the first attempt; all six upload receivers received the complete payload, uploaded zero bytes to sibling receivers, and reported zero failed hash bytes. An initial integration attempt stopped because the adapter expected <code>removed</code> after stopping an already complete seed; aria2 instead reports the terminal state <code>complete</code>. The adapter was corrected and all three full repetitions were restarted. No measurements from that initial attempt were included.</p>
 <p>The baseline rotated client order; corrective passes occurred later. System drift and cache state can therefore affect close comparisons. Source runs, the original failure, a post-failure diagnostic, and an explicit <a href="results/comparison/selection.json">selection rule</a> are retained. This was not one uninterrupted 180-phase run. aria2 ran after a Docker Desktop restart on the following day, with matching recorded CPU/memory capacity, kernel, engine version, resource limits, and fixture manifest. Its cases were not interleaved with the original five clients, so cache state and system drift may affect close rankings. Ambiguous progress diagnostics were recalculated from the original samples; wall times and resource counters were preserved.</p></section>
-<section id="scope-and-reproduction" aria-labelledby="heading-scope-and-reproduction"><div class="section-heading"><span class="section-number">05</span><h2 id="heading-scope-and-reproduction">Scope and reproduction</h2></div><p>This is a local TCP benchmark with generated private v1 torrents, mostly warm Linux caches, two reference peers, and fixed resource limits. It establishes observed performance for these images and workloads. It does not establish maximum throughput independent of reference CPU/storage limits, cold HDD behavior, encrypted/VPN transfers, internet peer diversity, v2 metadata, latency/loss tolerance, or long-term memory use. Reference-peer CPU, throttling, network, and block-I/O counters are retained to inspect lab bottlenecks.</p>
+<section id="scope-and-reproduction" aria-labelledby="heading-scope-and-reproduction"><div class="section-heading"><span class="section-number">06</span><h2 id="heading-scope-and-reproduction">Scope and reproduction</h2></div><p>The synthetic suite is a local TCP benchmark with generated private v1 torrents, mostly warm Linux caches, two reference peers, and fixed resource limits. It establishes observed performance for these images and workloads. It does not establish maximum throughput independent of reference CPU/storage limits, cold HDD behavior, encrypted/VPN transfers, internet peer diversity, v2 metadata, latency/loss tolerance, or long-term memory use. Reference-peer CPU, throttling, network, and block-I/O counters are retained to inspect lab bottlenecks.</p>
 <p>Run <code>./run.sh --output my-run --repeats 3</code>, then <code>python3 bench/summarize.py results/my-run</code> and <code>python3 bench/validate_results.py results/my-run</code>. The <a href="README.md">README</a> contains setup, isolation details, complete methodology, and commands to reconstruct the published selection from archived evidence. All 60 client/workload groups, variation, CPU, memory, and valid active-window rates are in <a href="results/comparison/SUMMARY.md">SUMMARY.md</a>, <a href="results/comparison/summary.csv">summary.csv</a>, and <a href="results/comparison/trials.json">trials.json</a>.</p>
 <pre aria-label="Reproduce the benchmark"><code>./run.sh --output my-run --repeats 3
 python3 bench/summarize.py results/my-run
 python3 bench/validate_results.py results/my-run</code></pre></section>
-<section id="all-measurements" aria-labelledby="heading-all-measurements"><div class="section-heading"><span class="section-number">06</span><h2 id="heading-all-measurements">All measurements</h2></div>
+<section id="all-measurements" aria-labelledby="heading-all-measurements"><div class="section-heading"><span class="section-number">07</span><h2 id="heading-all-measurements">All synthetic measurements</h2></div>
 <p>Every client and workload, with all three repetitions included. Rates and times are medians; the smaller time range is the observed minimum–maximum. Memory is in MiB. Recheck rates are cached hash-check throughput, not network throughput.</p>
 <div class="measurement-control" id="measurement-control" hidden><div><label for="client-filter">Show client</label><select id="client-filter"><option value="all">All clients</option><option value="qbittorrent">qBittorrent</option><option value="deluge">Deluge</option><option value="transmission">Transmission</option><option value="rtorrent">rTorrent</option><option value="rqbit">rqbit</option><option value="aria2">aria2</option></select></div><span class="row-count" id="row-count" role="status">60 of 60 groups</span></div>
 <div class="table-scroll measurements" role="region" tabindex="0" aria-label="All 60 measurement groups; scroll horizontally for memory counters"><table id="measurements"><caption class="sr-only">All 60 client and workload groups, each with three repetitions</caption><thead><tr><th scope="col">Client</th><th scope="col">Workload</th><th scope="col" class="num">n</th><th scope="col" class="num">Time, s<br>median / min–max</th><th scope="col" class="num">Rate<br>MiB/s</th><th scope="col" class="num">CPU<br>core-s</th><th scope="col" class="num">Median<br>RSS</th><th scope="col" class="num">Peak<br>RSS</th><th scope="col" class="num">Peak<br>anonymous</th><th scope="col" class="num">Peak<br>container</th><th scope="col" class="num">Peak<br>working set</th></tr></thead><tbody><tr data-client="qbittorrent"><th scope="row">qBittorrent</th><td>Empty idle</td><td class="num">3</td><td class="num">15.01<small class="cell-range">15.01–15.01</small></td><td class="num">—</td><td class="num">0.01</td><td class="num">33.7</td><td class="num">34.0</td><td class="num">4.8</td><td class="num">62.0</td><td class="num">61.1</td></tr>
@@ -371,11 +1340,11 @@ python3 bench/validate_results.py results/my-run</code></pre></section>
 <td class="num">32.1</td>
 </tr>
 </tbody></table></div></section>
-<section id="evidence" aria-labelledby="heading-evidence"><div class="section-heading"><span class="section-number">07</span><h2 id="heading-evidence">Evidence &amp; source files</h2></div><p>This page contains the complete narrative report and the 60 measured workload groups. Its charts use embedded measurements and work directly from disk, without a server or internet connection. The linked files retain the underlying precision and resource time series.</p>
-<div class="resource-links"><a href="REPORT.md">Narrative source</a><a href="results/comparison/summary.csv">Summary CSV</a><a href="results/comparison/trials.json">All trial records</a><a href="results/comparison/samples.jsonl.gz">Resource time series</a><a href="results/comparison/environment.json">Recorded environment</a><a href="results/comparison/validation.json">Validation audit</a><a href="results/comparison/selection.json">Run selection</a><a href="results/runs/baseline/post-failure-diagnostic.json">Post-failure diagnostic</a><a href="compose.yaml">Docker Compose</a><a href="images.env">Pinned images</a><a href="aria2/Dockerfile">aria2 image build</a><a href="aria2/measured-packages.txt">aria2 package inventory</a><a href="README.md">Setup &amp; methodology</a></div>
+<section id="evidence" aria-labelledby="heading-evidence"><div class="section-heading"><span class="section-number">08</span><h2 id="heading-evidence">Evidence &amp; source files</h2></div><p>This page contains the complete narrative report, 60 synthetic workload groups, all 36 main public Ubuntu attempts, and the six-attempt Deluge interface follow-up. Its charts use embedded measurements and work directly from disk, without a server or internet connection. The linked files retain the underlying precision and resource time series.</p>
+<div class="resource-links"><a href="REPORT.md">Narrative source</a><a href="results/comparison/summary.csv">Summary CSV</a><a href="results/comparison/trials.json">All trial records</a><a href="results/comparison/samples.jsonl.gz">Resource time series</a><a href="results/comparison/environment.json">Recorded environment</a><a href="results/comparison/validation.json">Validation audit</a><a href="results/comparison/selection.json">Run selection</a><a href="results/runs/baseline/post-failure-diagnostic.json">Post-failure diagnostic</a><a href="compose.yaml">Docker Compose</a><a href="images.env">Pinned images</a><a href="aria2/Dockerfile">aria2 image build</a><a href="aria2/measured-packages.txt">aria2 package inventory</a><a href="README.md">Setup &amp; methodology</a><a href="results/ubuntu-six-runs/protocol.json">Registered public protocol</a><a href="results/ubuntu-six-runs/analysis.json">Public statistical analysis</a><a href="results/ubuntu-six-runs/attempts.csv">Every public observation CSV</a><a href="results/ubuntu-six-runs/summary.csv">Ubuntu summary CSV</a><a href="results/ubuntu-six-runs/trials.json">Ubuntu trial records</a><a href="results/ubuntu-six-runs/samples.jsonl.gz">Ubuntu resource time series</a><a href="results/ubuntu-six-runs/validation.json">Ubuntu audit</a><a href="results/ubuntu-six-runs/host-link.jsonl">Ethernet observations</a><a href="results/ubuntu-deluge-ipv6/study.json">Deluge follow-up registration</a><a href="results/ubuntu-deluge-ipv6/attempts.csv">Deluge follow-up observations</a><a href="results/ubuntu-deluge-ipv6/validation.json">Deluge follow-up audit</a><a href="results/runs/ubuntu-deluge-interface-observer-diagnostic/invalidated.json">Excluded observer diagnostic</a><a href="compose.deluge-ipv6.yaml">Deluge interface overlay</a><a href="compose.ubuntu.yaml">Ubuntu Compose overlay</a><a href="ubuntu/source.json">Official torrent provenance</a></div>
 <h3>Upstream release references</h3><div class="source-list"><a href="https://www.qbittorrent.org/download">qBittorrent</a><a href="https://pypi.org/project/deluge/2.2.0/">Deluge 2.2.0</a><a href="https://github.com/transmission/transmission/releases/tag/4.1.4">Transmission 4.1.4</a><a href="https://github.com/rakshasa/rtorrent/releases/tag/v0.16.27">rTorrent 0.16.27</a><a href="https://github.com/ikatson/rqbit/releases/tag/v9.1.0">rqbit 9.1.0</a><a href="https://github.com/aria2/aria2/releases/tag/release-1.37.0">aria2 1.37.0</a></div><p class="resources-note">The initial five versions were resolved on 2026-11-02; aria2 was added on 2026-11-03. This page reports that pinned run; it does not check for newer releases when opened.</p></section>
 </main></div>
-<footer><span>270 GiB of synthetic transfers · Three repetitions · Measured 2026-11-02–03</span><a href="#">Back to top ↑</a></footer>
+<footer><span>Synthetic ×3 · Public main ×6 + Deluge interface ×6 · Measured 2026-11-02–03</span><a href="#">Back to top ↑</a></footer>
 <script type="application/json" id="chart-data">[{"client":"qbittorrent","workload":"download-large","median_mib_s":"399.1277134760755","min_mib_s":"350.3733412847003","max_mib_s":"402.49102556517465"},{"client":"qbittorrent","workload":"upload-2-peers","median_mib_s":"367.3781237205609","min_mib_s":"357.73389317021326","max_mib_s":"411.70508306406026"},{"client":"qbittorrent","workload":"download-files","median_mib_s":"250.304080225226","min_mib_s":"237.86647236045465","max_mib_s":"359.9789688754847"},{"client":"qbittorrent","workload":"download-concurrent","median_mib_s":"179.51137657879812","min_mib_s":"99.55869800140687","max_mib_s":"247.36476392554502"},{"client":"qbittorrent","workload":"download-shaped","median_mib_s":"29.876258229491008","min_mib_s":"29.800583336954876","max_mib_s":"29.903854712634057"},{"client":"deluge","workload":"download-large","median_mib_s":"171.08874668949332","min_mib_s":"165.29242418752702","max_mib_s":"179.5319633580472"},{"client":"deluge","workload":"upload-2-peers","median_mib_s":"337.1001176873949","min_mib_s":"295.2539378725373","max_mib_s":"374.83930926621593"},{"client":"deluge","workload":"download-files","median_mib_s":"96.45662940622556","min_mib_s":"93.17867665309574","max_mib_s":"98.03373857861516"},{"client":"deluge","workload":"download-concurrent","median_mib_s":"61.79869302711798","min_mib_s":"39.37330513164574","max_mib_s":"64.79977038140791"},{"client":"deluge","workload":"download-shaped","median_mib_s":"26.02481494376377","min_mib_s":"26.02467982226656","max_mib_s":"26.04431345207851"},{"client":"transmission","workload":"download-large","median_mib_s":"91.18406257987263","min_mib_s":"90.52176239366105","max_mib_s":"91.60201364805417"},{"client":"transmission","workload":"upload-2-peers","median_mib_s":"242.63412444583793","min_mib_s":"238.89754662518428","max_mib_s":"243.03684225251536"},{"client":"transmission","workload":"download-files","median_mib_s":"50.816161581915864","min_mib_s":"50.300527308661955","max_mib_s":"51.71294890567015"},{"client":"transmission","workload":"download-concurrent","median_mib_s":"47.05802415934065","min_mib_s":"19.75748307639689","max_mib_s":"72.92517329718387"},{"client":"transmission","workload":"download-shaped","median_mib_s":"23.224119225496615","min_mib_s":"23.166250043042655","max_mib_s":"23.36838983731557"},{"client":"rtorrent","workload":"download-large","median_mib_s":"257.187504244176","min_mib_s":"230.37431910772645","max_mib_s":"277.10373077027276"},{"client":"rtorrent","workload":"upload-2-peers","median_mib_s":"95.98944753769479","min_mib_s":"92.90684633333788","max_mib_s":"96.45464036441268"},{"client":"rtorrent","workload":"download-files","median_mib_s":"257.3986559052656","min_mib_s":"245.02589014263404","max_mib_s":"308.8640745105372"},{"client":"rtorrent","workload":"download-concurrent","median_mib_s":"66.87341531254661","min_mib_s":"36.98644486595889","max_mib_s":"395.15538448985035"},{"client":"rtorrent","workload":"download-shaped","median_mib_s":"30.67941464782738","min_mib_s":"30.327756852928207","max_mib_s":"30.691792464442997"},{"client":"rqbit","workload":"download-large","median_mib_s":"352.438141377787","min_mib_s":"337.13555536994136","max_mib_s":"358.75770405958923"},{"client":"rqbit","workload":"upload-2-peers","median_mib_s":"390.3372361592726","min_mib_s":"329.2041089813569","max_mib_s":"395.49694780053363"},{"client":"rqbit","workload":"download-files","median_mib_s":"349.4396586459003","min_mib_s":"318.97449689274424","max_mib_s":"351.6994497619063"},{"client":"rqbit","workload":"download-concurrent","median_mib_s":"410.3268733757035","min_mib_s":"273.1218887079167","max_mib_s":"515.6082045598772"},{"client":"rqbit","workload":"download-shaped","median_mib_s":"31.513385105686243","min_mib_s":"31.333309012137477","max_mib_s":"31.569779404852255"},{"client":"aria2","workload":"download-large","median_mib_s":"183.55413462533667","min_mib_s":"144.37999624553652","max_mib_s":"193.49523128874327"},{"client":"aria2","workload":"upload-2-peers","median_mib_s":"218.23284555471002","min_mib_s":"200.9376042761491","max_mib_s":"289.28008189320235"},{"client":"aria2","workload":"download-files","median_mib_s":"133.87045359656906","min_mib_s":"119.25355826638906","max_mib_s":"143.58143985112105"},{"client":"aria2","workload":"download-concurrent","median_mib_s":"207.3578103051535","min_mib_s":"70.69176267558761","max_mib_s":"214.8992999655688"},{"client":"aria2","workload":"download-shaped","median_mib_s":"29.992924957801545","min_mib_s":"29.7323523052635","max_mib_s":"30.084150959893584"}]</script>
 <script>
 (() => {
@@ -422,6 +1391,13 @@ python3 bench/validate_results.py results/my-run</code></pre></section>
     document.getElementById('chart-title').textContent = selector.selectedOptions[0].textContent;
   });
   const filter = document.getElementById('client-filter');
+  const publicMetric = document.getElementById('public-metric');
+  document.getElementById('public-chart-control').hidden = false;
+  publicMetric.addEventListener('change', () => {
+    document.querySelectorAll('.public-panel').forEach(panel => {
+      panel.hidden = panel.dataset.metric !== publicMetric.value;
+    });
+  });
   const measurements = [...document.querySelectorAll('#measurements tbody tr')];
   document.getElementById('measurement-control').hidden = false;
   filter.addEventListener('change', () => {

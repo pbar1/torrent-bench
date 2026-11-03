@@ -1,0 +1,10 @@
+{
+  "invalidated_utc": "2026-11-03T22:18:07.737472+00:00",
+  "original_directory": "results/ubuntu-deluge-ipv6",
+  "classification": "excluded observer diagnostic, interrupted",
+  "reason": "Optional discovery RPC timeouts blocked the synchronous timing observer. All recorded trials and partial samples from the interrupted attempt are preserved and excluded from performance comparisons.",
+  "replacement_rule": "After disabling optional discovery RPCs, execute a fresh fixed six-attempt follow-up; retain all outcomes.",
+  "recorded_trials": 2,
+  "recorded_verified_completions": 2,
+  "replacement_directory": "../../ubuntu-deluge-ipv6"
+}

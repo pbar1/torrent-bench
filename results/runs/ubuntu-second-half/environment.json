@@ -1,0 +1,202 @@
+{
+  "NCPU": 8,
+  "MemTotal": 8319770624,
+  "KernelVersion": "7.0.14-linuxkit",
+  "OperatingSystem": "Docker Desktop",
+  "Architecture": "aarch64",
+  "ServerVersion": "29.9.2",
+  "Driver": "overlayfs",
+  "CgroupVersion": "2",
+  "utc": "2026-11-03T19:08:57.722642+00:00",
+  "arguments": {
+    "repeats": 1,
+    "clients": [
+      "rtorrent",
+      "rqbit",
+      "aria2"
+    ],
+    "timeout": 600,
+    "stall_seconds": 180,
+    "host_interface": "en9",
+    "host_link": "1000baseT-full-duplex",
+    "output": "runs/ubuntu-second-half"
+  },
+  "harness_sha256": {
+    "swarm.py": "44c425d1e81e10c097d7a195a9fed569508bde50987220da0842260c0ea17a5d",
+    "assemble_results.py": "09edeca705d777ab7a4a5f7e29ac6bf665d35dd467cb989292d6a0c175fe430b",
+    "run.py": "7f597b5ad9fd410fd36c697b6cad084e95685e8fc4290533bb057118ca88d188",
+    "summarize_ubuntu.py": "607199794b1538482f99714ae52f3ff157eef64d468da442cd3b992cf0a92313",
+    "ubuntu_run.py": "225917d5e3bbbf4b62a05a7372d1647cd5ff870ee7dff81f17fc19f20889a9d4",
+    "test_results.py": "bb121c9cd28a447dd3cdbe374e60ab225f1c8e6375af1376ebe48c2ded633187",
+    "test_ubuntu_results.py": "62922ee97388f5efe89b93f1c069868410d6fea4995e688b20d8ad6d64c0c57d",
+    "test_ubuntu.py": "d63b89d88362c825ac69bf70ccf7ec0af811bab6092e8c01395bd817e9ee0b0d",
+    "summarize.py": "72c311408198e0d559a161046e0351bc44c2bac7bcc22f6c000a1fd8c45d9890",
+    "validate_results.py": "a2a7072e3a8f7045cd11bb8deeaa1a77d16f7067ab21803928e9593e2093bdd4",
+    "api.py": "70a51423d89359662bffc2866b60938f0f45f1a15cbae006ac54ba0ff175038b",
+    "test_fixtures.py": "490e76ea0a205d6424c8fe11b384694c3f0034da6da41f798c428b6a9ef7ba7e",
+    "tracker.py": "0875c855ccdae761e0ec2059f66dd7e854563846998e506c8957debde9d0caa2",
+    "fixtures.py": "facfc8b135f893c9b67c59a559b3862b4719840d89ab517cc2e22808f2f89d93",
+    "assemble_ubuntu.py": "3f9daf9126fc208963d38f5534094edf7fed4962183fff2409d414eeb037584f"
+  },
+  "network": {
+    "name": "torrent-bench-ubuntu_lab",
+    "internal": true,
+    "ipam": {
+      "Driver": "default",
+      "Options": null,
+      "Config": [
+        {
+          "Subnet": "172.19.0.0/16",
+          "Gateway": "172.19.0.1"
+        }
+      ]
+    }
+  },
+  "containers": {
+    "qbittorrent": {
+      "image_id": "sha256:43b2d352cf76330a7ca34c7320b9b74227d6f31e662e0e123d0457206b09a7ea",
+      "image_ref": "qbittorrentofficial/qbittorrent-nox@sha256:43b2d352cf76330a7ca34c7320b9b74227d6f31e662e0e123d0457206b09a7ea",
+      "image_digests": [
+        "qbittorrentofficial/qbittorrent-nox@sha256:43b2d352cf76330a7ca34c7320b9b74227d6f31e662e0e123d0457206b09a7ea"
+      ],
+      "architecture": "arm64",
+      "host_config": {
+        "NanoCpus": 2000000000,
+        "Memory": 1610612736,
+        "MemorySwap": 1610612736,
+        "NetworkMode": "torrent-bench-ubuntu_internet"
+      },
+      "command": null
+    },
+    "deluge": {
+      "image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+      "image_ref": "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+      "image_digests": [
+        "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc"
+      ],
+      "architecture": "arm64",
+      "host_config": {
+        "NanoCpus": 2000000000,
+        "Memory": 1610612736,
+        "MemorySwap": 1610612736,
+        "NetworkMode": "torrent-bench-ubuntu_internet"
+      },
+      "command": null
+    },
+    "transmission": {
+      "image_id": "sha256:5b3c27a96c8a37c878a525ebf377a32032c3a3acfe845ecaa7c3eb10b09c2caa",
+      "image_ref": "lscr.io/linuxserver/transmission@sha256:5b3c27a96c8a37c878a525ebf377a32032c3a3acfe845ecaa7c3eb10b09c2caa",
+      "image_digests": [
+        "lscr.io/linuxserver/transmission@sha256:5b3c27a96c8a37c878a525ebf377a32032c3a3acfe845ecaa7c3eb10b09c2caa"
+      ],
+      "architecture": "arm64",
+      "host_config": {
+        "NanoCpus": 2000000000,
+        "Memory": 1610612736,
+        "MemorySwap": 1610612736,
+        "NetworkMode": "torrent-bench-ubuntu_internet"
+      },
+      "command": null
+    },
+    "rtorrent": {
+      "image_id": "sha256:ec4c785d845d67f9088f4c47590388127a832b8d9cae65c5f69a9fcd67c7c22f",
+      "image_ref": "torrent-bench-rtorrent:0.16.27",
+      "image_digests": [
+        "torrent-bench-rtorrent@sha256:ec4c785d845d67f9088f4c47590388127a832b8d9cae65c5f69a9fcd67c7c22f"
+      ],
+      "architecture": "arm64",
+      "host_config": {
+        "NanoCpus": 2000000000,
+        "Memory": 1610612736,
+        "MemorySwap": 1610612736,
+        "NetworkMode": "torrent-bench-ubuntu_internet"
+      },
+      "command": [
+        "rtorrent",
+        "-n",
+        "-o",
+        "import=/config/rtorrent.rc"
+      ]
+    },
+    "rqbit": {
+      "image_id": "sha256:db3204d68b9a6327fc51f3bccb5048f04e4dcaf4f7737351e2a00ec997e46c17",
+      "image_ref": "ikatson/rqbit@sha256:db3204d68b9a6327fc51f3bccb5048f04e4dcaf4f7737351e2a00ec997e46c17",
+      "image_digests": [
+        "ikatson/rqbit@sha256:db3204d68b9a6327fc51f3bccb5048f04e4dcaf4f7737351e2a00ec997e46c17"
+      ],
+      "architecture": "arm64",
+      "host_config": {
+        "NanoCpus": 2000000000,
+        "Memory": 1610612736,
+        "MemorySwap": 1610612736,
+        "NetworkMode": "torrent-bench-ubuntu_internet"
+      },
+      "command": [
+        "--disable-lsd",
+        "--disable-upnp-port-forward",
+        "--ipv4-only",
+        "--listen-port",
+        "6881",
+        "--http-api-listen-addr",
+        "0.0.0.0:3030",
+        "-v",
+        "warn",
+        "server",
+        "start",
+        "--persistence-location",
+        "/config/db",
+        "/downloads"
+      ]
+    },
+    "aria2": {
+      "image_id": "sha256:78b2bb7f74020ba5e4af5190cb87e7d8e2ea5142cbed35fa90044281e108e4d8",
+      "image_ref": "torrent-bench-aria2:1.37.0",
+      "image_digests": [
+        "torrent-bench-aria2@sha256:78b2bb7f74020ba5e4af5190cb87e7d8e2ea5142cbed35fa90044281e108e4d8"
+      ],
+      "architecture": "arm64",
+      "host_config": {
+        "NanoCpus": 2000000000,
+        "Memory": 1610612736,
+        "MemorySwap": 1610612736,
+        "NetworkMode": "torrent-bench-ubuntu_internet"
+      },
+      "command": [
+        "--no-conf=true",
+        "--enable-rpc=true",
+        "--rpc-listen-all=true",
+        "--rpc-listen-port=6800",
+        "--rpc-save-upload-metadata=false",
+        "--dir=/downloads",
+        "--enable-dht=true",
+        "--enable-dht6=false",
+        "--dht-entry-point=dht.transmissionbt.com:6881",
+        "--dht-file-path=/config/dht.dat",
+        "--enable-peer-exchange=true",
+        "--bt-enable-lpd=false",
+        "--disable-ipv6=true",
+        "--listen-port=6881",
+        "--bt-max-peers=100",
+        "--max-concurrent-downloads=2000",
+        "--max-download-result=2000",
+        "--seed-ratio=0.0",
+        "--max-upload-limit=0",
+        "--max-overall-upload-limit=0",
+        "--console-log-level=warn",
+        "--summary-interval=0"
+      ]
+    }
+  },
+  "mode": "public Ubuntu swarm",
+  "public_network": {
+    "name": "torrent-bench-ubuntu_internet",
+    "internal": false
+  },
+  "host_link": {
+    "interface": "en9",
+    "link": "1000baseT-full-duplex"
+  },
+  "payload_retention": "Deleted after every trial; shared scratch volume removed on exit.",
+  "discovery": "DHT and PEX enabled; LAN discovery and port forwarding disabled.",
+  "transport": "TCP/uTP defaults where supported; IPv4 Docker networking; no published ports."
+}

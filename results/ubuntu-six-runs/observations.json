@@ -1,0 +1,17 @@
+{
+  "recorded_utc": "2026-11-03T20:01:24+00:00",
+  "observations": [
+    {
+      "client": "deluge",
+      "repeat": 1,
+      "event": "Read-only socket inspection during the second attempt",
+      "port": 6881,
+      "socket_entries_by_family": {"tcp": 3, "tcp6": 0, "udp": 3, "udp6": 0},
+      "settings": {"listen_interface": "", "outgoing_interface": "", "dht": true},
+      "source_reference": "https://github.com/deluge-torrent/deluge/blob/deluge-2.2.0/deluge/core/preferencesmanager.py#L205-L223",
+      "finding": "The empty native listen-interface preference resolves to the IPv4 wildcard. A dual-stack Docker network does not by itself change this client default.",
+      "configuration_changed": false,
+      "observer_note": "A short Python process inside the client read /proc/net. The outer Docker command took 0.235 seconds including setup. This extra inspection may contribute a small CPU/RSS/anonymous-memory observer cost to this attempt; it is retained and disclosed. No other timed attempt receives this manual inspection."
+    }
+  ]
+}

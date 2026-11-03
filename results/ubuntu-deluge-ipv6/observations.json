@@ -1,0 +1,12 @@
+{
+  "observed_utc": "2026-11-03T22:27:43.293654+00:00",
+  "observation": "Docker changes eth0/eth1 naming across fresh container starts. The registered condition selects the interface carrying the outgoing default route on every start, rather than a fixed literal name. study.listen_interface records the paused preflight observation.",
+  "effective_settings_observed": {
+    "deluge-0.json": "eth0",
+    "deluge-1.json": "eth0",
+    "deluge-2.json": "eth0",
+    "deluge-3.json": "eth1"
+  },
+  "measurement_change": false,
+  "evidence": "Archived profile/bench/deluge-ipv6-init.sh reads /proc/net/route, requires exactly one default gateway interface, and writes that interface into the preference before daemon startup."
+}

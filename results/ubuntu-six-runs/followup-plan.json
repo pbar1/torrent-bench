@@ -1,0 +1,13 @@
+{
+  "registered_utc": "2026-11-03T21:10:29.762315+00:00",
+  "classification": "Exploratory conditional follow-up, planned after observing the first three native-profile Deluge attempts; not part of the original 36-slot protocol.",
+  "decision_rule": "After all 36 original slots finish, run this follow-up only if Deluge has fewer than three independently verified completions among its six original attempts.",
+  "purpose": "Exercise loaded download performance and memory with a working IPv6 listen interface rather than relying on one successful native-profile download.",
+  "condition": "Same Deluge image, quotas, metadata, fresh daemon/configuration/payload, deadline, discovery settings and network. Set listen_interface to the interface carrying the default outgoing route, enabling native IPv4/IPv6 sockets. Validate sockets in a separate preflight before timed trials.",
+  "planned_attempts": 6,
+  "deadline_s": 900,
+  "early_stall_cutoff": null,
+  "stopping_rule": "Run all six assigned follow-up attempts once; retain every failure; never replace native-profile measurements or select fastest runs.",
+  "analysis": "Separate condition: every attempt, completion count, conditional median/IQR/range, CPU and sampled memory distributions. Do not pool with the native-profile cohort or claim a contemporaneous head-to-head speed ranking.",
+  "retention": "One shared scratch ISO; independent SHA-256 outside timer; delete after every attempt; remove project volumes on exit."
+}

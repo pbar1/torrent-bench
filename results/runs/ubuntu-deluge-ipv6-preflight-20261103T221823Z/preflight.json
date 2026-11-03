@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "utc": "2026-11-03T22:18:26.346896+00:00",
+  "listen_interface": "eth1",
+  "port_6881_socket_entries": {
+    "tcp": 1,
+    "tcp6": 2,
+    "udp": 1,
+    "udp6": 2
+  },
+  "torrent_paused": true,
+  "performance_measurement": false
+}

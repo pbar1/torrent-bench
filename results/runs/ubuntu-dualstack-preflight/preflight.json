@@ -1,0 +1,138 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "client": "qbittorrent",
+      "version": "v5.3.0",
+      "diagnostics": {
+        "peer_families": {
+          "ipv4": 0,
+          "ipv6": 0,
+          "unknown": 0
+        },
+        "seeds": 0,
+        "leechers": 0,
+        "dht_nodes": 0
+      }
+    },
+    {
+      "client": "deluge",
+      "version": "2.0.13.0",
+      "diagnostics": {
+        "peers": 0,
+        "seeds": 0,
+        "peer_families": {
+          "ipv4": 0,
+          "ipv6": 0,
+          "unknown": 0
+        },
+        "tracker_ok": false,
+        "dht": {
+          "dht.dht_nodes": 0
+        }
+      }
+    },
+    {
+      "client": "transmission",
+      "version": "4.1.4 (a6d907d9ea)",
+      "diagnostics": {
+        "peers": 0,
+        "peer_sources": {
+          "fromCache": 0,
+          "fromDht": 0,
+          "fromIncoming": 0,
+          "fromLpd": 0,
+          "fromLtep": 0,
+          "fromPex": 0,
+          "fromTracker": 0
+        },
+        "peer_families": {
+          "ipv4": 0,
+          "ipv6": 0,
+          "unknown": 0
+        },
+        "trackers": [
+          {
+            "success": false,
+            "returned_peers": 0
+          },
+          {
+            "success": false,
+            "returned_peers": 0
+          }
+        ]
+      }
+    },
+    {
+      "client": "rtorrent",
+      "version": "0.16.27",
+      "diagnostics": {
+        "peer_families": {
+          "ipv4": 0,
+          "ipv6": 0,
+          "unknown": 0
+        },
+        "dht": {
+          "active": 1,
+          "buckets": 1,
+          "bytes_read": 0,
+          "bytes_written": 0,
+          "cycle": 1,
+          "dht": "on",
+          "errors_caught": 0,
+          "errors_received": 0,
+          "nodes": 0,
+          "peers": 0,
+          "peers_max": 0,
+          "queries_received": 0,
+          "queries_sent": 0,
+          "replies_received": 0,
+          "throttle": "",
+          "torrents": 0
+        },
+        "trackers": [
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            1,
+            0,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            0,
+            0
+          ]
+        ]
+      }
+    },
+    {
+      "client": "rqbit",
+      "version": "9.1.0",
+      "diagnostics": {
+        "state": "initializing",
+        "peer_counters": {}
+      }
+    },
+    {
+      "client": "aria2",
+      "version": "1.37.0",
+      "diagnostics": {
+        "peers": 0,
+        "seeds": 0,
+        "download_bytes_s": 0,
+        "peer_families": {
+          "ipv4": 0,
+          "ipv6": 0,
+          "unknown": 0
+        }
+      }
+    }
+  ]
+}

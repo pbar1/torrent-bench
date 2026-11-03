@@ -34,9 +34,9 @@ def docker(method, path, body=None, raw=False):
     return content if raw else json.loads(content) if content else None
 
 
-def containers():
+def containers(project='torrent-bench'):
     rows = docker('GET', '/containers/json?all=true&filters=' + urllib.parse.quote(
-        json.dumps({'label': ['com.docker.compose.project=torrent-bench']})))
+        json.dumps({'label': ['com.docker.compose.project=' + project]})))
     return {r['Labels']['com.docker.compose.service']: r['Id'] for r in rows
             if r['Labels'].get('com.docker.compose.oneoff') == 'False'}
 
@@ -71,11 +71,11 @@ class Qbit(HTTP):
     def ready(self):
         return self.call('app/version')
 
-    def configure(self):
-        settings = dict(dht=False, pex=False, lsd=False, upnp=False,
+    def configure(self, public=False):
+        settings = dict(dht=public, pex=public, lsd=False, upnp=False,
                         queueing_enabled=False, max_connec=2000, max_connec_per_torrent=100,
                         max_uploads=2000, max_uploads_per_torrent=100,
-                        bittorrent_protocol=1, dl_limit=0, up_limit=0)
+                        bittorrent_protocol=0 if public else 1, dl_limit=0, up_limit=0)
         self.call('app/setPreferences', form={'json': json.dumps(settings)})
         return {'version': self.ready(), 'build': self.call('app/buildInfo'),
                 'preferences': self.call('app/preferences')}
@@ -123,13 +123,13 @@ class Deluge(HTTP):
             self.rpc('web.connect', hosts[0][0])
         return self.rpc('core.get_libtorrent_version')
 
-    def configure(self):
+    def configure(self, public=False):
         self.rpc('core.set_config', dict(download_location='/downloads',
                  max_active_limit=2000, max_active_downloading=2000, max_active_seeding=2000,
                  max_connections_global=2000, max_connections_per_torrent=100,
                  max_upload_slots_global=2000, max_upload_slots_per_torrent=100,
-                 max_download_speed=-1, max_upload_speed=-1, dht=False, lsd=False,
-                 utpex=False, upnp=False, natpmp=False, random_port=False,
+                 max_download_speed=-1, max_upload_speed=-1, dht=public, lsd=False,
+                 utpex=public, upnp=False, natpmp=False, random_port=False,
                  listen_ports=[6881, 6881], rate_limit_ip_overhead=False))
         return {'version': self.rpc('daemon.get_version'), 'library': self.rpc('core.get_libtorrent_version'),
                 'preferences': self.rpc('core.get_config')}
@@ -171,10 +171,10 @@ class Transmission(HTTP):
     def ready(self):
         return self.rpc('session-get')['version']
 
-    def configure(self):
-        self.rpc('session-set', **{'download-dir': '/downloads', 'dht-enabled': False,
-                 'pex-enabled': False, 'lpd-enabled': False, 'port-forwarding-enabled': False,
-                 'utp-enabled': False, 'peer-port': 6881, 'peer-port-random-on-start': False,
+    def configure(self, public=False):
+        self.rpc('session-set', **{'download-dir': '/downloads', 'dht-enabled': public,
+                 'pex-enabled': public, 'lpd-enabled': False, 'port-forwarding-enabled': False,
+                 'utp-enabled': public, 'peer-port': 6881, 'peer-port-random-on-start': False,
                  'peer-limit-global': 2000, 'peer-limit-per-torrent': 100,
                  'download-queue-enabled': False, 'seed-queue-enabled': False,
                  'speed-limit-down-enabled': False, 'speed-limit-up-enabled': False,
@@ -216,7 +216,7 @@ class Rtorrent:
     def ready(self):
         return self.rpc('system.client_version')
 
-    def configure(self):
+    def configure(self, public=False):
         return {'version': self.ready(), 'library': self.rpc('system.library_version')}
 
     def add(self, torrent, paused=False):
@@ -240,7 +240,7 @@ class Rqbit(HTTP):
     def ready(self):
         return self.call('/')['version']
 
-    def configure(self):
+    def configure(self, public=False):
         return self.call('/')
 
     def add(self, torrent, paused=False):
@@ -281,7 +281,7 @@ class Aria2(HTTP):
     def ready(self):
         return self.rpc('aria2.getVersion')['version']
 
-    def configure(self):
+    def configure(self, public=False):
         return {'version': self.rpc('aria2.getVersion'),
                 'preferences': self.rpc('aria2.getGlobalOption')}
 

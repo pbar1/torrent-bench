@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "trials": 3,
+  "timeouts": [
+    {
+      "client": "rtorrent",
+      "repeat": 0,
+      "workload": "ubuntu-public"
+    },
+    {
+      "client": "aria2",
+      "repeat": 0,
+      "workload": "ubuntu-public"
+    }
+  ],
+  "scratch_empty": true
+}

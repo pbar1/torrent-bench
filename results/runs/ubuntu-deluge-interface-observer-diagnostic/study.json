@@ -1,0 +1,20 @@
+{
+  "registered_utc": "2026-11-03T22:09:39.512131+00:00",
+  "classification": "exploratory interface follow-up",
+  "native_cohort": "../ubuntu-six-runs",
+  "native_trials_sha256": "6456007a7d7f9e34add6ebd399cd2ef357ab1376cf12ca3fb7ac00839b7a60d4",
+  "planned_attempts": 6,
+  "deadline_s": 900,
+  "early_stall_cutoff": null,
+  "condition": "Set listen_interface to the outgoing default-route interface; all other benchmark settings stay the same.",
+  "listen_interface": "eth0",
+  "preflight": "runs/ubuntu-deluge-ipv6-preflight-20261103T220935Z/preflight.json",
+  "preflight_sha256": "a2bbc09566d9734ec1cd266c919c133dd7af16a1bba33f1d1ec6609b0bfe4e5f",
+  "same_deluge_image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+  "stopping_rule": "Execute all six attempts once; retain failures; do not pool with the native cohort.",
+  "comparison_scope": "A different configuration in a later window; no contemporaneous head-to-head speed claim.",
+  "profile_sha256": {
+    "compose.deluge-ipv6.yaml": "3ce2f8b13c78559b3fb16ec10f9de0a07a8ec13dba5e0ae304c1042efeeb837f",
+    "bench/deluge-ipv6-init.sh": "4bd38b4f5101667cf91fb3df6358d47952b3d20c04749f96c75387b3eef98d25"
+  }
+}

@@ -1,0 +1,9 @@
+# Exploratory follow-up: bind Deluge's peer sockets to the outgoing interface.
+# Use together with compose.yaml and compose.ubuntu.yaml.
+services:
+  deluge:
+    volumes:
+      - ./bench/deluge-ipv6-init.sh:/custom-cont-init.d/15-outgoing-interface.sh:ro
+  bench:
+    volumes:
+      - ./compose.deluge-ipv6.yaml:/study-profile.yaml:ro

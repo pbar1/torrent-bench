@@ -1,9 +1,10 @@
 # Synthetic torrent client benchmark
 
 A closed Docker Compose lab for qBittorrent, Deluge, Transmission, rTorrent,
-rqbit, and aria2. It generates every payload and `.torrent` locally. There are no public
+rqbit, and aria2. The default suite generates every payload and `.torrent` locally. There are no public
 torrents, magnets, internet trackers, published ports, or internet-connected
-runtime networks.
+runtime networks in that suite. A separately opted-in Ubuntu public-swarm test is
+described below.
 
 Open [index.html](index.html) directly in a browser for the complete findings,
 interactive throughput chart, and all 60 workload groups. It works offline with
@@ -19,7 +20,7 @@ per client.
 
 Requires a local Docker Engine/Desktop with Compose, native amd64 or arm64,
 8 CPUs, about 8 GiB of VM memory, and 32 GiB of available Docker volume storage.
-Image pulls and image builds need internet access; the benchmark does not.
+Image pulls and image builds need internet access; the synthetic benchmark does not.
 
 ```sh
 ./run.sh --output my-run --repeats 3
@@ -76,6 +77,168 @@ To remove this lab's data after inspecting the results:
 
 ```sh
 docker compose --env-file images.env down --volumes
+```
+
+## Public Ubuntu fresh downloads
+
+This opt-in extension downloads the real Ubuntu ISO requested for the WAN
+comparison. It runs separately from the synthetic lab with the same pinned six
+versions, 2-core quota, 1,536 MiB charged-memory limit, and no swap. The main
+public experiment in `results/ubuntu-six-runs/` has **six fresh attempts per
+client, 36 total**. `index.html` includes every observation and the full findings.
+
+On this macOS Ethernet host, start the sanitized link/route monitor in a separate
+terminal, leave it running throughout the experiment, and stop it after the
+runner finishes:
+
+```sh
+python3 bench/watch_link.py results/ubuntu-my-run --interface en9
+```
+
+Then run the experiment, stop the monitor, and analyze:
+
+```sh
+./run-ubuntu.sh --output ubuntu-my-run --repeats 6 --timeout 900 \
+  --stall-seconds 0 --order-seed 20261103 \
+  --host-interface en9 --host-link 1000baseT-full-duplex
+python3 bench/analyze_ubuntu.py results/ubuntu-my-run
+```
+
+Use an unused output name. The interface arguments record the intended link;
+they do not select or enforce a host route. The host monitor checks that both
+primary IPv4 and IPv6 routes use the active gigabit Ethernet interface. The
+full analysis audits those observations. Do not run other benchmarks alongside
+this experiment. The runner itself works through Docker Compose; the supplied
+host-link monitor uses macOS `ifconfig` and `netstat` output.
+
+The unmodified official
+[Ubuntu 26.04.1 server torrent](https://releases.ubuntu.com/26.04/ubuntu-26.04.1-live-server-amd64.iso.torrent)
+is retained in `ubuntu/torrents/ubuntu.torrent`. `ubuntu/source.json` pins its
+SHA-256, info hash, payload size, and ISO SHA-256 from Ubuntu's
+[SHA256SUMS](https://releases.ubuntu.com/26.04/SHA256SUMS). There are no web seeds
+and no direct HTTP ISO download.
+
+The runner saves `protocol.json` **before the first measurement**, including
+orders, endpoints, stopping rule, exclusions, and analysis plan. The seeded
+six-round Williams design puts each client in every position once and each
+ordered adjacent client pair once within rounds. Round-boundary transitions
+are not balanced. Every registered slot runs once; slow or failed valid attempts
+are retained. The fixed deadline is 900 seconds, checked between API polls;
+there is no early no-progress cutoff. The historical diagnostic attempts do
+not enter this cohort.
+
+Every attempt starts a fresh daemon, configuration, DHT routing table, and
+empty destination. The timer starts at API submission after daemon readiness
+and ends on reported completion. It includes discovery, file allocation,
+transfer, final-piece behavior, and polling overhead. Status polling targets
+0.2 seconds, peer-discovery diagnostics 15 seconds, and resource sampling
+0.5 seconds. Docker API latency can create longer resource-sampling gaps; the
+analysis records the actual cadence, and memory peaks are sampled lower bounds. The client stops before the independent filesystem SHA-256 check,
+which is outside the timer. Effective settings and their hashes are saved per
+attempt; the measurement source is archived with hashes before execution.
+The payload and client state are reset; host/VM/disk caches are not globally
+flushed. Fresh application state does not mean a cold hardware cache.
+For rqbit, the XDG configuration/cache directories and explicit session database
+are under `/config`; its [DHT persistence implementation](https://github.com/ikatson/rqbit/blob/v9.1.0/crates/dht/src/persistence.rs#L87-L92)
+uses the cache directory, so the reset clears saved routing and peer state too.
+
+`compose.ubuntu.yaml` provides a **dual-stack outgoing network** with Docker
+NAT and no forwarded incoming ports. The host and Docker must have functioning
+IPv6 connectivity. The runner uses a separate internal control network. DHT and
+PEX are enabled; native TCP/uTP support applies. LAN discovery and automatic
+port forwarding are disabled. rTorrent uses explicit DHT bootstrap nodes;
+aria2 uses `--dht-entry-point=dht.transmissionbt.com:6881` and a writable cache.
+aria2 allows IPv6 peer connections while retaining its default disabled IPv6
+DHT. Deluge retains its native empty listen-interface preference, which its
+[2.2.0 implementation](https://github.com/deluge-torrent/deluge/blob/deluge-2.2.0/deluge/core/preferencesmanager.py#L205-L223)
+resolves to an IPv4 wildcard; a read-only socket inspection confirmed IPv4-only
+sockets in that profile. A dual-stack network does not force every application
+to use IPv6. This compares the recorded deployable configurations, not identical
+internal algorithms, protocol choices, or peer limits. The five clients with
+explicit per-torrent peer controls are capped at 100; rqbit retains its native
+policy. No synthetic reference peers are started.
+Public peers can receive pieces during a download; transmit counters record
+this traffic.
+
+All clients share **one temporary payload volume**, with at most one
+2,927,861,760-byte ISO (2.73 GiB). The ISO and sidecars are deleted after every
+attempt, including failures; each trial records an empty-scratch check. The
+shell exit trap removes the public Compose project and its volumes. No ISO is
+saved in the repository. If all 36 attempts complete, six rounds transfer about
+**98.2 GiB** of ISO payload, plus protocol overhead and uploads, retaining only metadata and
+measurements. The original synthetic project's volumes are separate.
+
+The analysis reports every attempt, median, inclusive IQR, full range, completion
+count with a Wilson 95% interval, and a mean completion time that penalizes each
+failure with the full 900 seconds. Failed attempts receive no full-file rate.
+Memory distributions include all attempts, with partial work identified. The
+public swarm, peer choice, ISP, congestion, and time dependence are uncontrolled.
+Six repetitions and order balancing improve this measurement, but do not
+establish a universal speed ranking, engine capacity, or performance with a
+warmed DHT table. The binomial assumptions behind the Wilson interval are also
+limited by that time dependence. No significance claims are made.
+
+The older `results/ubuntu-public/` collection is an **IPv4-only, one-attempt
+pilot**, retained for transparency. Its rTorrent and aria2 timeouts motivated
+investigation: the setup had disabled IPv6 despite a working IPv6 host link.
+Ubuntu's IPv4 tracker has a documented
+[single-peer response problem](https://github.com/canonical/ubuntu.com/issues/15735).
+The corrected dual-stack pilot completed both clients; only the new 36-attempt
+cohort is used for the repeated public findings. Earlier interrupted diagnostics,
+source batches, and the pilot selection record remain in `results/runs/` and
+`results/ubuntu-public/`; they are not substituted for main-experiment attempts.
+
+### Separate Deluge interface follow-up
+
+The native Deluge profile completed only 2/6. A conditional plan recorded before
+the main experiment finished required another fixed six attempts if fewer than
+three completed. This follow-up changes `listen_interface` to the Linux interface
+carrying the outgoing default route. An untimed, paused-torrent preflight checks
+both IPv4 and IPv6 TCP/UDP sockets. It changes interface binding as well as
+address-family availability and runs in a later window; it is a separate
+configuration study, never pooled with the main results.
+
+The first follow-up was invalidated because optional discovery RPC timeouts
+blocked completion polling. Its original records, partial samples, traceback,
+and exclusion reason remain in
+`results/runs/ubuntu-deluge-interface-observer-diagnostic/`. Before restarting a
+new fixed six-attempt series, the profile was amended to skip optional discovery
+RPCs. Basic status polling and resource sampling remain enabled. This observer
+setting does not disable client peer discovery. `study.json` registers the
+amendment before the new measurements; the analyzer rejects RPC errors in valid
+performance cohorts. The main 36-attempt experiment had none.
+
+With the archived native experiment available, reproduce this separate profile
+using an unused name and its own link monitor, stopped after the runner exits:
+
+```sh
+python3 bench/watch_link.py results/deluge-interface-my-run --interface en9
+# In another terminal:
+./run-deluge-ipv6.sh deluge-interface-my-run \
+  --host-interface en9 --host-link 1000baseT-full-duplex
+# After stopping the monitor:
+python3 bench/analyze_ubuntu.py results/deluge-interface-my-run
+```
+
+The wrapper fixes six attempts and a 900-second deadline, archives the Compose
+overlay and init script, and removes payload volumes on exit. It also checks the
+native cohort's trigger and image identity. Published follow-up evidence lives
+in `results/ubuntu-deluge-ipv6/`: 6/6 verified completions, median 17.31 MiB/s
+(IQR 15.60–19.40; range 11.28–20.78). Docker can rename `eth0`/`eth1` between
+fresh starts; the profile detects the outgoing default route every time.
+These later observations do not isolate IPv6 causality or replace the native 2/6 result.
+
+The stdlib measurement and analysis checks can run without Docker:
+
+```sh
+PYTHONPATH=bench python3 -m unittest test_results test_ubuntu test_ubuntu_results test_public_analysis
+```
+
+To regenerate the standalone browser report from the published cohort paths
+and `REPORT.md` after analysis and narrative edits:
+
+```sh
+python3 bench/render_report.py
 ```
 
 ## Images and provenance
@@ -324,7 +487,7 @@ discards the completion sidecar, and re-adds the existing files with
 is unlimited by ratio so both 4 GiB upload receivers can finish. Queue and peer
 limits are raised; allocation, disk cache, and file-management algorithms keep
 their package defaults: 16 MiB cache, `prealloc`, mmap disabled, and 100 cached
-open files. All public peer discovery remains disabled.
+open files. All public peer discovery remains disabled in the synthetic suite.
 
 The default full suite now selects all six clients. To audit a historical
 five-client run, pass `--clients qbittorrent deluge transmission rtorrent rqbit`

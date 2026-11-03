@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "trials": 6,
+  "completed_downloads": 4,
+  "all_downloads_completed": false,
+  "independent_sha256_checks": 4,
+  "verified_payload_bytes": 11711447040,
+  "resource_samples": 2408,
+  "iso_retained": false,
+  "cleanups_with_empty_scratch": 6,
+  "input_sha256": {
+    "trials.json": "fdb270942913bbdcfb5c9864265d4c066cd75d299396503b2af07dbd974c4ae3",
+    "samples.jsonl.gz": "7c15d7bccbac1351f42cbefad7a463f895af535b81b68ce9230dc6664fa7bdc4",
+    "torrent-source.json": "8052a7436f0843ceeb8857f52e5bed5d76a7eb9e838f51491783ce5c0bdab84f"
+  }
+}

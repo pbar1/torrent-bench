@@ -1,0 +1,22 @@
+{
+  "registered_utc": "2026-11-03T22:18:26.346896+00:00",
+  "classification": "exploratory interface follow-up",
+  "native_cohort": "../ubuntu-six-runs",
+  "native_trials_sha256": "6456007a7d7f9e34add6ebd399cd2ef357ab1376cf12ca3fb7ac00839b7a60d4",
+  "planned_attempts": 6,
+  "deadline_s": 900,
+  "early_stall_cutoff": null,
+  "condition": "Set listen_interface to the outgoing default-route interface; other client settings stay the same.",
+  "observer_amendment": "Disable optional discovery RPCs after an excluded diagnostic run exposed blocking timeouts. Basic status polling and resource measurement are unchanged.",
+  "excluded_observer_diagnostic": "../runs/ubuntu-deluge-interface-observer-diagnostic",
+  "listen_interface": "eth1",
+  "preflight": "runs/ubuntu-deluge-ipv6-preflight-20261103T221823Z/preflight.json",
+  "preflight_sha256": "97e94dcd5692a0a07fb57d9e256f7c26f2ea1c67446965bfe0360218f58b9895",
+  "same_deluge_image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+  "stopping_rule": "Execute all six attempts once; retain failures; do not pool with the native cohort.",
+  "comparison_scope": "A different configuration in a later window; no contemporaneous head-to-head speed claim.",
+  "profile_sha256": {
+    "compose.deluge-ipv6.yaml": "5f9ab08757866ff168b9831948a92fc7d1116f475bd1f6321c5f516bab1ab443",
+    "bench/deluge-ipv6-init.sh": "4bd38b4f5101667cf91fb3df6358d47952b3d20c04749f96c75387b3eef98d25"
+  }
+}

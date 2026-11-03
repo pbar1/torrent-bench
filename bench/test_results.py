@@ -83,6 +83,7 @@ class ResultsTest(unittest.TestCase):
             bench.ids = {'leech1': 'one', 'leech2': 'two'}
             bench.output = Path(directory)
             bench.results = []
+            bench.reference_peers = True
 
             def stalled():
                 raise TransferTimeout({'reason': 'stalled', 'verified_payload_bytes': 16384})

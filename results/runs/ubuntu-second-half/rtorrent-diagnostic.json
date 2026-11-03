@@ -1,0 +1,33 @@
+{
+  "utc": "2026-11-03T19:09:48.499648+00:00",
+  "client": "rtorrent",
+  "dht": {
+    "active": 1,
+    "buckets": 1,
+    "bytes_read": 0,
+    "bytes_written": 0,
+    "cycle": 1,
+    "dht": "on",
+    "errors_caught": 0,
+    "errors_received": 0,
+    "nodes": 1,
+    "peers": 0,
+    "peers_max": 0,
+    "queries_received": 0,
+    "queries_sent": 5,
+    "replies_received": 3,
+    "throttle": "",
+    "torrents": 0
+  },
+  "torrent_status": [
+    {
+      "id": "e4f19cf636409b72571766c2ae89c98fc21a109d",
+      "done": false,
+      "bytes": 0,
+      "state": "",
+      "checking": false,
+      "paused": false,
+      "error": false
+    }
+  ]
+}

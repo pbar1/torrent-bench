@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "/bench/run.py", line 114, in wait_ready
+    return client.ready()
+           ^^^^^^^^^^^^^^
+  File "/bench/api.py", line 217, in ready
+    return self.rpc('system.client_version')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bench/api.py", line 208, in rpc
+    with socket.create_connection(('rtorrent', 5000), timeout=30) as conn:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/socket.py", line 841, in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno -3] Temporary failure in name resolution
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/bench/ubuntu_run.py", line 121, in run
+    self.trial(name, repeat)
+  File "/bench/ubuntu_run.py", line 93, in trial
+    client = self.start(name, public=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bench/run.py", line 292, in start
+    wait_ready(client, cid=self.ids[name])
+  File "/bench/run.py", line 119, in wait_ready
+    raise RuntimeError(f'Client exited during startup: {logs!r}') from e
+RuntimeError: Client exited during startup: b'\x01\x00\x00\x00\x00\x00\x00\xa1rtorrent: caughtN7torrent11input_errorE : Failed to parse command line option: Error in option file: /config/rtorrent.rc:14: Command "schedule2" does not exist.\n'

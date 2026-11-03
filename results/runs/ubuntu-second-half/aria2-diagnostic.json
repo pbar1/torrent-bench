@@ -1,0 +1,42 @@
+{
+  "utc": "2026-11-03T19:14:52.020371+00:00",
+  "client": "aria2",
+  "active": [
+    {
+      "bittorrent": {
+        "announceList": [
+          [
+            "https://torrent.ubuntu.com/announce"
+          ],
+          [
+            "https://ipv6.torrent.ubuntu.com/announce"
+          ]
+        ],
+        "comment": "Ubuntu CD releases.ubuntu.com",
+        "creationDate": 1787864651,
+        "info": {
+          "name": "ubuntu-26.04.1-live-server-amd64.iso"
+        },
+        "mode": "single"
+      },
+      "completedLength": "0",
+      "connections": "0",
+      "downloadSpeed": "0",
+      "gid": "97aaf7ba3aa662ce",
+      "numSeeders": "0",
+      "status": "active",
+      "totalLength": "2927861760"
+    }
+  ],
+  "peer_counts": {
+    "97aaf7ba3aa662ce": 0
+  },
+  "global": {
+    "downloadSpeed": "0",
+    "numActive": "1",
+    "numStopped": "0",
+    "numStoppedTotal": "0",
+    "numWaiting": "0",
+    "uploadSpeed": "0"
+  }
+}

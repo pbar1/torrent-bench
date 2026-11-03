@@ -1,0 +1,85 @@
+{
+  "utc": "2026-11-03T18:51:50.225138+00:00",
+  "client": "transmission",
+  "repeat": 0,
+  "status": {
+    "torrents": [
+      {
+        "desiredAvailable": 16384,
+        "peersConnected": 1,
+        "peersFrom": {
+          "fromCache": 0,
+          "fromDht": 0,
+          "fromIncoming": 0,
+          "fromLpd": 0,
+          "fromLtep": 0,
+          "fromPex": 0,
+          "fromTracker": 1
+        },
+        "rateDownload": 122880,
+        "trackerStats": [
+          {
+            "announce": "https://torrent.ubuntu.com/announce",
+            "announceState": 1,
+            "downloadCount": 5,
+            "downloader_count": -1,
+            "hasAnnounced": true,
+            "hasScraped": true,
+            "host": "torrent.ubuntu.com:443",
+            "id": 0,
+            "isBackup": false,
+            "lastAnnouncePeerCount": 1,
+            "lastAnnounceResult": "Success",
+            "lastAnnounceStartTime": 1793731834,
+            "lastAnnounceSucceeded": true,
+            "lastAnnounceTime": 1793731835,
+            "lastAnnounceTimedOut": false,
+            "lastScrapeResult": "",
+            "lastScrapeStartTime": 1793731840,
+            "lastScrapeSucceeded": true,
+            "lastScrapeTime": 1793731840,
+            "lastScrapeTimedOut": false,
+            "leecherCount": 20,
+            "nextAnnounceTime": 1793733635,
+            "nextScrapeTime": 1793733640,
+            "scrape": "https://torrent.ubuntu.com/scrape",
+            "scrapeState": 1,
+            "seederCount": 1175,
+            "sitename": "ubuntu",
+            "tier": 0
+          },
+          {
+            "announce": "https://ipv6.torrent.ubuntu.com/announce",
+            "announceState": 1,
+            "downloadCount": 5,
+            "downloader_count": -1,
+            "hasAnnounced": true,
+            "hasScraped": true,
+            "host": "ipv6.torrent.ubuntu.com:443",
+            "id": 1,
+            "isBackup": false,
+            "lastAnnouncePeerCount": 1,
+            "lastAnnounceResult": "Success",
+            "lastAnnounceStartTime": 1793731834,
+            "lastAnnounceSucceeded": true,
+            "lastAnnounceTime": 1793731835,
+            "lastAnnounceTimedOut": false,
+            "lastScrapeResult": "",
+            "lastScrapeStartTime": 1793731840,
+            "lastScrapeSucceeded": true,
+            "lastScrapeTime": 1793731840,
+            "lastScrapeTimedOut": false,
+            "leecherCount": 20,
+            "nextAnnounceTime": 1793733635,
+            "nextScrapeTime": 1793733640,
+            "scrape": "https://ipv6.torrent.ubuntu.com/scrape",
+            "scrapeState": 1,
+            "seederCount": 1175,
+            "sitename": "ubuntu",
+            "tier": 1
+          }
+        ]
+      }
+    ]
+  }
+}

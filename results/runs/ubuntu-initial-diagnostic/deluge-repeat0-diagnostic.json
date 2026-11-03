@@ -1,0 +1,16 @@
+{
+  "utc": "2026-11-03T18:42:15.222639+00:00",
+  "client": "deluge",
+  "repeat": 0,
+  "torrents": {
+    "e4f19cf636409b72571766c2ae89c98fc21a109d": {
+      "tracker_status": "Announce OK",
+      "num_seeds": 0,
+      "total_done": 5226496,
+      "state": "Downloading",
+      "download_payload_rate": 68318,
+      "num_peers": 1,
+      "message": "OK"
+    }
+  }
+}

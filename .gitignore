@@ -2,3 +2,5 @@ __pycache__/
 .DS_Store
 results/**/samples.jsonl
 results/**/events.jsonl
+*.iso
+*.iso.aria2

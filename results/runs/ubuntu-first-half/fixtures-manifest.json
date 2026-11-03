@@ -1,0 +1,15 @@
+[
+  {
+    "name": "ubuntu",
+    "group": "ubuntu-public",
+    "bytes": 2927861760,
+    "hash": "e4f19cf636409b72571766c2ae89c98fc21a109d",
+    "files": [
+      {
+        "path": "ubuntu-26.04.1-live-server-amd64.iso",
+        "bytes": 2927861760,
+        "sha256": "cc8a95cde20f6ced61a322420de00f10cc3c90ced545daa46cb9c1a117f1d927"
+      }
+    ]
+  }
+]

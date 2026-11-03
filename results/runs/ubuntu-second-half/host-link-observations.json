@@ -1,0 +1,14 @@
+[
+  {
+    "utc": "2026-11-03T19:09:26.286745+00:00",
+    "primary_ipv4_interface": "en9",
+    "media": "autoselect (1000baseT <full-duplex>)",
+    "status": "active"
+  },
+  {
+    "utc": "2026-11-03T19:23:21.426451+00:00",
+    "primary_ipv4_interface": "en9",
+    "media": "autoselect (1000baseT <full-duplex>)",
+    "status": "active"
+  }
+]

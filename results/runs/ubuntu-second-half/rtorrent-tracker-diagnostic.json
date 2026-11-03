@@ -1,0 +1,60 @@
+{
+  "utc": "2026-11-03T19:10:50.772562+00:00",
+  "client": "rtorrent",
+  "columns": [
+    "url",
+    "enabled",
+    "usable",
+    "successes",
+    "failures",
+    "new_peers",
+    "sum_peers"
+  ],
+  "trackers": [
+    [
+      "https://torrent.ubuntu.com/announce",
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      "https://ipv6.torrent.ubuntu.com/announce",
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ],
+    [
+      "dht://",
+      1,
+      1,
+      1,
+      0,
+      0,
+      0
+    ]
+  ],
+  "dht": {
+    "active": 1,
+    "buckets": 1,
+    "bytes_read": 0,
+    "bytes_written": 0,
+    "cycle": 1,
+    "dht": "on",
+    "errors_caught": 0,
+    "errors_received": 0,
+    "nodes": 1,
+    "peers": 0,
+    "peers_max": 0,
+    "queries_received": 0,
+    "queries_sent": 7,
+    "replies_received": 4,
+    "throttle": "",
+    "torrents": 0
+  }
+}

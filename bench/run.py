@@ -34,12 +34,17 @@ def transfer_details(samples, total):
             'progress_samples': [[round(t, 4), b] for t, b in samples]}
 
 
-class TransferTimeout(Exception):
+class TrialFailure(Exception):
+    def __init__(self, details, status='error'):
+        self.details, self.status = details, status
+
+
+class TransferTimeout(TrialFailure):
     def __init__(self, details):
-        self.details = details
+        super().__init__(details, 'timeout')
 
 
-def reset(name):
+def reset(name, public=False):
     base = Path('/clients') / name
     for folder in ('config', 'data'):
         path = base / folder
@@ -88,6 +93,17 @@ throttle.max_uploads.set = 100
 ''')
     for path in config.rglob('*'):
         os.chown(path, 1000, 1000)
+    if public and name == 'rtorrent':
+        path = config / 'rtorrent.rc'
+        path.write_text(path.read_text().replace('dht.mode.set = disable', 'dht.mode.set = on')
+                        .replace('protocol.pex.set = no', 'protocol.pex.set = yes')
+                        .replace('trackers.use_udp.set = no', 'trackers.use_udp.set = yes'))
+        with path.open('a') as handle:
+            handle.write('''dht.port.set = 6881
+dht.add_node = dht.transmissionbt.com:6881
+dht.add_node = router.bittorrent.com:6881
+dht.add_node = router.bitcomet.com:6881
+''')
 
 
 def wait_ready(client, timeout=90, cid=None):
@@ -174,15 +190,17 @@ def snapshot(cid):
 
 
 class Meter:
-    def __init__(self, ids, client, output):
+    def __init__(self, ids, client, output, reference_peers=True):
         self.ids, self.client, self.output = ids, client, output
+        self.labels = ('client', 'peer1', 'peer2') if reference_peers else ('client',)
         self.samples = []
         self.stop_event = threading.Event()
 
     def collect(self):
-        with concurrent.futures.ThreadPoolExecutor(3) as pool:
-            values = list(pool.map(snapshot, [self.ids[self.client], self.ids['peer1'], self.ids['peer2']]))
-        sample = {'time': time.monotonic(), 'client': values[0], 'peer1': values[1], 'peer2': values[2]}
+        ids = [self.ids[self.client]] + [self.ids[p] for p in self.labels[1:]]
+        with concurrent.futures.ThreadPoolExecutor(len(ids)) as pool:
+            values = list(pool.map(snapshot, ids))
+        sample = {'time': time.monotonic(), **dict(zip(self.labels, values))}
         self.samples.append(sample)
 
     def loop(self):
@@ -210,7 +228,7 @@ class Meter:
         first, last = valid[0], valid[-1]
         elapsed = last['time'] - first['time']
         metrics = {'samples': len(valid), 'measurement_s': elapsed}
-        for key in ('client', 'peer1', 'peer2'):
+        for key in self.labels:
             rows = [s[key] for s in valid]
             metrics[key] = {f'peak_{field}': max(r[field] for r in rows)
                             for field in ('memory_mib', 'working_mib', 'anon_mib', 'file_mib', 'rss_mib')}
@@ -223,9 +241,10 @@ class Meter:
 
 
 class Benchmark:
-    def __init__(self, args):
+    def __init__(self, args, project='torrent-bench', reference_peers=True):
         self.args = args
-        self.ids = containers()
+        self.ids = containers(project)
+        self.reference_peers = reference_peers
         self.fixtures = json.loads((ROOT / 'manifest.json').read_text())
         self.output = Path('/results') / args.output
         self.output.mkdir(parents=True, exist_ok=True)
@@ -240,7 +259,7 @@ class Benchmark:
         self.environment['arguments'] = vars(args)
         self.environment['harness_sha256'] = {
             p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in Path('/bench').glob('*.py')}
-        network_name = 'torrent-bench_lab'
+        network_name = project + '_lab'
         network = docker('GET', '/networks/' + network_name)
         if not network['Internal']:
             raise RuntimeError('The benchmark network must be internal')
@@ -248,7 +267,8 @@ class Benchmark:
                                        'ipam': network['IPAM']}
         shutil.copyfile(ROOT / 'manifest.json', self.output / 'fixtures-manifest.json')
         self.environment['containers'] = {}
-        for name in (*CLIENTS, 'peer1', 'peer2', 'leech1', 'leech2'):
+        names = list(CLIENTS) + (['peer1', 'peer2', 'leech1', 'leech2'] if reference_peers else [])
+        for name in names:
             inspect = docker('GET', '/containers/' + self.ids[name] + '/json')
             image = docker('GET', '/images/' + inspect['Image'] + '/json')
             self.environment['containers'][name] = {
@@ -265,12 +285,12 @@ class Benchmark:
         if inspect['State']['OOMKilled']:
             raise RuntimeError(name + ' was OOM killed')
 
-    def start(self, name):
-        reset(name)
+    def start(self, name, public=False):
+        reset(name, public=public)
         docker('POST', '/containers/' + self.ids[name] + '/start')
         client = CLIENTS[name]()
         wait_ready(client, cid=self.ids[name])
-        config = client.configure()
+        config = client.configure(public=public)
         if name == 'rtorrent':
             config['configuration'] = (Path('/clients') / name / 'config/rtorrent.rc').read_text()
         write_json(self.output / (name + '-effective-settings.json'), config)
@@ -282,15 +302,18 @@ class Benchmark:
         metric_ids = dict(self.ids)
         if workload == 'upload-2-peers':
             metric_ids.update(peer1=self.ids['leech1'], peer2=self.ids['leech2'])
-        meter = Meter(metric_ids, name, self.output)
+        meter = Meter(metric_ids, name, self.output, reference_peers=self.reference_peers)
         meter.start()
         start = time.monotonic()
         status = 'ok'
         try:
             details = action()
-        except TransferTimeout as error:
+        except TrialFailure as error:
             details = error.details
-            status = 'timeout'
+            status = error.status
+        except BaseException:
+            meter.finish(tag)
+            raise
         duration = time.monotonic() - start
         metrics = meter.finish(tag)
         result = {**tag, 'status': status, 'elapsed_s': duration, 'payload_bytes': byte_count,

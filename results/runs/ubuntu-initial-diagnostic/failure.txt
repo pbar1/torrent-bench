@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/bench/ubuntu_run.py", line 119, in run
+    self.trial(name, repeat)
+  File "/bench/ubuntu_run.py", line 92, in trial
+    trial = self.measured(name, repeat, 'ubuntu-public',
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bench/run.py", line 304, in measured
+    details = action()
+              ^^^^^^^^
+  File "/bench/ubuntu_run.py", line 93, in <lambda>
+    lambda: self.transfer(client, name, repeat), self.torrent['bytes'])
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/bench/ubuntu_run.py", line 85, in transfer
+    time.sleep(0.2)
+KeyboardInterrupt
