@@ -5,11 +5,48 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from api import Qbit
+from api import Aria2, Qbit
 from run import Benchmark, TransferTimeout, transfer_details, verify
 
 
 class ResultsTest(unittest.TestCase):
+    def test_aria2_recheck_accepts_a_complete_terminal_result_and_discards_resume(self):
+        client = Aria2()
+        client.gids = {'hash': 'old'}
+        torrent = {'hash': 'hash', 'files': [{'path': 'large.bin'}]}
+        with tempfile.TemporaryDirectory() as directory:
+            sidecar = Path(directory) / 'large.bin.aria2'
+            sidecar.write_bytes(b'cached complete pieces')
+            with patch.object(client, 'rpc', side_effect=['old', {'status': 'complete'}, 'OK']), \
+                    patch('api.Path', return_value=sidecar), patch.object(client, 'add') as add:
+                client.recheck(torrent)
+            self.assertFalse(sidecar.exists())
+            add.assert_called_once_with(torrent, check=True)
+
+    def test_aria2_hash_check_does_not_look_like_a_complete_seed(self):
+        client = Aria2()
+        client.gids = {'hash': 'current'}
+        row = {'gid': 'current', 'infoHash': 'hash', 'status': 'active',
+               'totalLength': '1024', 'completedLength': '1024'}
+        with patch.object(client, 'rpc', return_value=[[[{**row, 'verifiedLength': '0'}]], [[]], [[]]]):
+            status = client.status()[0]
+        self.assertTrue(status['checking'])
+        self.assertFalse(status['done'])
+        with patch.object(client, 'rpc', return_value=[[[row]], [[]], [[]]]):
+            self.assertTrue(client.status()[0]['done'])
+
+    def test_aria2_removed_gid_cannot_override_its_readded_torrent(self):
+        client = Aria2()
+        client.gids = {'hash': 'current'}
+        paused = {'gid': 'current', 'infoHash': 'hash', 'status': 'paused',
+                  'totalLength': '1024', 'completedLength': '0'}
+        removed = {**paused, 'gid': 'old', 'status': 'removed'}
+        with patch.object(client, 'rpc', return_value=[[[]], [[paused]], [[removed]]]):
+            statuses = client.status()
+        self.assertEqual(len(statuses), 1)
+        self.assertTrue(statuses[0]['paused'])
+        self.assertFalse(statuses[0]['done'])
+
     def test_progress_reset_does_not_become_a_transfer_or_startup_rate(self):
         result = transfer_details([(0.01, 600), (0.2, 10), (1, 1000)], 1000)
         self.assertFalse(result['progress_monotonic'])

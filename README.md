@@ -1,25 +1,25 @@
 # Synthetic torrent client benchmark
 
-A closed Docker Compose lab for qBittorrent, Deluge, Transmission, rTorrent, and
-rqbit. It generates every payload and `.torrent` locally. There are no public
+A closed Docker Compose lab for qBittorrent, Deluge, Transmission, rTorrent,
+rqbit, and aria2. It generates every payload and `.torrent` locally. There are no public
 torrents, magnets, internet trackers, published ports, or internet-connected
 runtime networks.
 
 Open [index.html](index.html) directly in a browser for the complete findings,
-interactive throughput chart, and all 50 workload groups. It works offline with
+interactive throughput chart, and all 60 workload groups. It works offline with
 no server or build step.
 
 The narrative source is [REPORT.md](REPORT.md), with
 [all result tables](results/comparison/SUMMARY.md) and
 [the audit totals](results/comparison/validation.json). The accepted measurements
-contain 150 phases and 225 GiB of synthetic transfers, across three repetitions
+contain 180 phases and 270 GiB of synthetic transfers, across three repetitions
 per client.
 
 ## Run
 
 Requires a local Docker Engine/Desktop with Compose, native amd64 or arm64,
-8 CPUs, about 8 GiB of VM memory, and 25 GiB of available Docker volume storage.
-Image pulls and the rTorrent build need internet access; the benchmark does not.
+8 CPUs, about 8 GiB of VM memory, and 32 GiB of available Docker volume storage.
+Image pulls and image builds need internet access; the benchmark does not.
 
 ```sh
 ./run.sh --output my-run --repeats 3
@@ -40,14 +40,15 @@ python3 bench/summarize.py results/my-run
 python3 bench/validate_results.py results/my-run
 ```
 
-The validator expects the full five-client suite with three repetitions by
-default; pass `--repeats` when auditing a different repeat count.
+The validator expects the full six-client suite with three repetitions by
+default; pass `--repeats` or `--clients` when auditing a different repeat count
+or client subset.
 
 For a shorter run, or a subset:
 
 ```sh
 ./run.sh --output short --repeats 1 --idle-seconds 3 \
-  --clients qbittorrent deluge transmission rtorrent rqbit \
+  --clients qbittorrent deluge transmission rtorrent rqbit aria2 \
   --workloads large files concurrent shaped catalog
 ```
 
@@ -55,6 +56,7 @@ Manual steps, if preferred:
 
 ```sh
 docker compose --env-file images.env build rtorrent
+docker compose --env-file images.env build aria2
 docker compose --env-file images.env run --rm --no-deps bench python /bench/fixtures.py
 docker compose --env-file images.env create --force-recreate
 docker compose --env-file images.env start tracker peer1 peer2 leech1 leech2
@@ -78,8 +80,9 @@ docker compose --env-file images.env down --volumes
 
 ## Images and provenance
 
-Stable versions were resolved on **2026-11-02** and checked by running their
-binaries. `images.env` pins immutable multi-platform image manifest digests;
+The initial five stable versions were resolved on **2026-11-02**; aria2 was
+added on **2026-11-03**. All versions were checked by running their binaries.
+`images.env` pins immutable multi-platform prebuilt image manifest digests;
 `environment.json` additionally records the actual platform image IDs. No
 emulation is requested.
 
@@ -90,6 +93,7 @@ emulation is requested.
 | Transmission | 4.1.4 | `lscr.io/linuxserver/transmission` | Maintained community image |
 | rTorrent | 0.16.27 | Local `rtorrent/Dockerfile` | Unpatched upstream release, matching Rakshasa libtorrent |
 | rqbit | 9.1.0 | `ikatson/rqbit` | Upstream author's image |
+| aria2 | 1.37.0 | Local `aria2/Dockerfile` | Alpine 1.37.0-r2 package, locked runtime dependencies |
 
 rTorrent's Docker wiki explicitly identifies its linked image as community
 maintained. A small source build lets this suite use the current release rather
@@ -101,8 +105,10 @@ those versions to remain available; missing versions fail the build rather than
 silently upgrading dependencies. Measured executable/library hashes are retained
 in `rtorrent/measured-binaries.sha256`. A clean rebuild with the package locks
 produced identical executable and libtorrent hashes. Build attestations and
-image metadata may differ between rebuilds. Other clients and reference peers
-use pinned prebuilt images.
+image metadata may differ between rebuilds. aria2 uses a minimal local image
+with a pinned Alpine base and locked package dependency versions; its measured
+binary hash, package inventory, and version output are retained in `aria2/`.
+The remaining clients and reference peers use pinned prebuilt images.
 
 Primary references:
 
@@ -116,6 +122,9 @@ Primary references:
   [upstream Docker wiki](https://github.com/rakshasa/rtorrent/wiki/Docker)
 - [rqbit 9.1.0](https://github.com/ikatson/rqbit/releases/tag/v9.1.0),
   [upstream Docker instructions](https://github.com/ikatson/rqbit#docker)
+- [aria2 1.37.0](https://github.com/aria2/aria2/releases/tag/release-1.37.0),
+  [Alpine package](https://pkgs.alpinelinux.org/package/v3.24/community/aarch64/aria2),
+  [upstream RPC manual](https://aria2.github.io/manual/en/html/aria2c.html)
 
 ## Workloads
 
@@ -262,7 +271,8 @@ invariants with libtorrent, and every piece hash/path of the 2,048-file fixture.
 ## Published run provenance
 
 The published comparison combines the unaffected baseline cases, a complete
-three-repeat qBittorrent rerun, and the remaining Deluge repetition. The baseline
+three-repeat qBittorrent rerun, the remaining Deluge repetition, and a later
+three-repeat aria2 extension. The baseline
 stopped on an immediate qBittorrent filesystem verification mismatch; all 2,048
 files matched after clean shutdown. Completion/recheck monitoring was tightened,
 and every qBittorrent baseline case was replaced. See [REPORT.md](REPORT.md) for
@@ -275,7 +285,7 @@ To reproduce the published tables from the archived measurements:
 ```sh
 python3 bench/assemble_results.py results/runs/baseline \
   results/runs/qbittorrent-corrected results/runs/deluge-final-repeat \
-  results/reassembled
+  results/reassembled --aria2-run results/runs/aria2
 python3 bench/validate_results.py results/reassembled
 python3 bench/summarize.py results/reassembled
 ```
@@ -283,3 +293,41 @@ python3 bench/summarize.py results/reassembled
 Choose an unused destination. The assembly script reads compressed or plain
 resource samples and preserves the raw measured times and resource counters.
 Future uninterrupted full runs can be summarized and validated directly.
+
+## aria2 extension
+
+The runner also supports aria2 1.37.0 using a minimal local image containing
+Alpine's `aria2=1.37.0-r2` package. The Alpine base is pinned by digest and its
+package dependency versions are locked in `aria2/apk-runtime.lock`. The
+[upstream release](https://github.com/aria2/aria2/releases/tag/release-1.37.0)
+and [RPC manual](https://aria2.github.io/manual/en/html/aria2c.html) are the primary
+references. The selected package uses aria2's own BitTorrent implementation.
+
+The published aria2 run completed all 30 phases and transferred 45 GiB of
+synthetic payload. Its 12 downloads passed filesystem verification on the first
+attempt. It was collected on the next day after a Docker restart, with matching
+recorded VM capacity, engine, kernel, resource limits, and fixtures. The original
+150 trial records were retained unchanged; see the report's collection-history
+limitations for comparisons across the two days.
+
+To repeat just its extension, choose a fresh output name:
+
+```sh
+./run.sh --output aria2-my-run --clients aria2 --repeats 3
+python3 bench/summarize.py results/aria2-my-run
+python3 bench/validate_results.py results/aria2-my-run --clients aria2
+```
+
+Like rqbit, aria2 has no force-recheck RPC. The adapter removes its torrent,
+discards the completion sidecar, and re-adds the existing files with
+`check-integrity=true`; the runner must observe actual hash checking. Seeding
+is unlimited by ratio so both 4 GiB upload receivers can finish. Queue and peer
+limits are raised; allocation, disk cache, and file-management algorithms keep
+their package defaults: 16 MiB cache, `prealloc`, mmap disabled, and 100 cached
+open files. All public peer discovery remains disabled.
+
+The default full suite now selects all six clients. To audit a historical
+five-client run, pass `--clients qbittorrent deluge transmission rtorrent rqbit`
+to `bench/validate_results.py`. The aria2 run is included in the published
+assembly with `--aria2-run results/runs/aria2`; original measurements are retained
+without choosing faster repetitions.

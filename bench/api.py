@@ -1,13 +1,15 @@
-"""Small stdlib adapters for the five clients and the Docker Engine API."""
+"""Small stdlib adapters for the clients and the Docker Engine API."""
 import base64
 import http.client
 import http.cookiejar
 import json
 import socket
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
 import xmlrpc.client
+from pathlib import Path
 
 from fixtures import ROOT
 
@@ -264,5 +266,75 @@ class Rqbit(HTTP):
         self.add(torrent)
 
 
+class Aria2(HTTP):
+    def __init__(self):
+        super().__init__('http://aria2:6800/jsonrpc')
+        self.gids = {}
+
+    def rpc(self, method, *params):
+        result = self.call('', value={'jsonrpc': '2.0', 'id': 'bench',
+                                     'method': method, 'params': list(params)})
+        if 'error' in result:
+            raise RuntimeError(result['error'])
+        return result['result']
+
+    def ready(self):
+        return self.rpc('aria2.getVersion')['version']
+
+    def configure(self):
+        return {'version': self.rpc('aria2.getVersion'),
+                'preferences': self.rpc('aria2.getGlobalOption')}
+
+    def add(self, torrent, paused=False, check=False):
+        data = base64.b64encode((ROOT / 'torrents' / (torrent['name'] + '.torrent')).read_bytes()).decode()
+        self.gids[torrent['hash']] = self.rpc('aria2.addTorrent', data, [], {
+            'dir': '/downloads', 'pause': str(paused).lower(),
+            'check-integrity': str(check).lower()})
+
+    def status(self):
+        keys = ['gid', 'infoHash', 'status', 'totalLength', 'completedLength',
+                'errorCode', 'errorMessage', 'verifiedLength', 'verifyIntegrityPending']
+        calls = [{'methodName': 'aria2.' + method, 'params': params}
+                 for method, params in [('tellActive', [keys]),
+                                        ('tellWaiting', [0, 2000, keys]),
+                                        ('tellStopped', [0, 2000, keys])]]
+        rows = []
+        for result in self.rpc('system.multicall', calls):
+            if isinstance(result, dict):
+                raise RuntimeError(result)
+            rows.extend(result[0])
+        statuses = []
+        for row in rows:
+            info_hash = row.get('infoHash', '').lower()
+            if self.gids.get(info_hash) != row['gid']:
+                continue
+            checking = 'verifiedLength' in row or row.get('verifyIntegrityPending') in (True, 'true')
+            done_bytes, total = int(row['completedLength']), int(row['totalLength'])
+            statuses.append({'id': info_hash, 'bytes': done_bytes, 'state': row['status'],
+                             'done': total > 0 and done_bytes == total and not checking
+                                     and row['status'] in ('active', 'complete'),
+                             'checking': checking, 'paused': row['status'] == 'paused',
+                             'error': row['status'] == 'error',
+                             'error_message': row.get('errorMessage', '')})
+        return statuses
+
+    def recheck(self, torrent):
+        # aria2 has no force-recheck RPC. Re-add existing files with integrity
+        # checking enabled, after removing any saved piece-completion sidecar.
+        gid = self.gids[torrent['hash']]
+        self.rpc('aria2.forceRemove', gid)
+        deadline = time.monotonic() + 10
+        # Removing an already complete seed produces a terminal "complete"
+        # result in aria2, rather than "removed". Both release the files.
+        while self.rpc('aria2.tellStatus', gid, ['status'])['status'] not in ('removed', 'complete'):
+            if time.monotonic() >= deadline:
+                raise TimeoutError('aria2 did not release the torrent for recheck')
+            time.sleep(0.05)
+        self.rpc('aria2.removeDownloadResult', gid)
+        for file in torrent['files']:
+            Path('/clients/aria2/data', file['path'] + '.aria2').unlink(missing_ok=True)
+        self.add(torrent, check=True)
+
+
 CLIENTS = {'qbittorrent': Qbit, 'deluge': Deluge, 'transmission': Transmission,
-           'rtorrent': Rtorrent, 'rqbit': Rqbit}
+           'rtorrent': Rtorrent, 'rqbit': Rqbit, 'aria2': Aria2}

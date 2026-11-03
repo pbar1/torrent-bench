@@ -631,6 +631,253 @@
           "command": null
         }
       }
+    },
+    "aria2": {
+      "NCPU": 8,
+      "MemTotal": 8319770624,
+      "KernelVersion": "7.0.14-linuxkit",
+      "OperatingSystem": "Docker Desktop",
+      "Architecture": "aarch64",
+      "ServerVersion": "29.9.2",
+      "Driver": "overlayfs",
+      "CgroupVersion": "2",
+      "utc": "2026-11-03T17:59:47.998960+00:00",
+      "arguments": {
+        "repeats": 3,
+        "repeat_offset": 0,
+        "clients": [
+          "aria2"
+        ],
+        "workloads": [
+          "large",
+          "files",
+          "concurrent",
+          "shaped",
+          "catalog"
+        ],
+        "idle_seconds": 15,
+        "output": "runs/aria2"
+      },
+      "harness_sha256": {
+        "swarm.py": "44c425d1e81e10c097d7a195a9fed569508bde50987220da0842260c0ea17a5d",
+        "assemble_results.py": "09edeca705d777ab7a4a5f7e29ac6bf665d35dd467cb989292d6a0c175fe430b",
+        "run.py": "ddb07f2ffc1d2ad5005f30205eb341f54c61c2b2f14b7ca21e9ea25e2f8dc85d",
+        "test_results.py": "ed018acd6373c924d462b24673ba7df01513c79d297573e0a0b6b941b6a052f6",
+        "summarize.py": "72c311408198e0d559a161046e0351bc44c2bac7bcc22f6c000a1fd8c45d9890",
+        "validate_results.py": "a2a7072e3a8f7045cd11bb8deeaa1a77d16f7067ab21803928e9593e2093bdd4",
+        "api.py": "475aef913077cdc658263d0024c2cb7378d3a0ef57b3f2ca12999323dfd924a2",
+        "test_fixtures.py": "490e76ea0a205d6424c8fe11b384694c3f0034da6da41f798c428b6a9ef7ba7e",
+        "tracker.py": "0875c855ccdae761e0ec2059f66dd7e854563846998e506c8957debde9d0caa2",
+        "fixtures.py": "facfc8b135f893c9b67c59a559b3862b4719840d89ab517cc2e22808f2f89d93"
+      },
+      "network": {
+        "name": "torrent-bench_lab",
+        "internal": true,
+        "ipam": {
+          "Driver": "default",
+          "Options": null,
+          "Config": [
+            {
+              "Subnet": "172.18.0.0/16",
+              "Gateway": "172.18.0.1"
+            }
+          ]
+        }
+      },
+      "containers": {
+        "qbittorrent": {
+          "image_id": "sha256:43b2d352cf76330a7ca34c7320b9b74227d6f31e662e0e123d0457206b09a7ea",
+          "image_ref": "qbittorrentofficial/qbittorrent-nox@sha256:43b2d352cf76330a7ca34c7320b9b74227d6f31e662e0e123d0457206b09a7ea",
+          "image_digests": [
+            "qbittorrentofficial/qbittorrent-nox@sha256:43b2d352cf76330a7ca34c7320b9b74227d6f31e662e0e123d0457206b09a7ea"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": null
+        },
+        "deluge": {
+          "image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_ref": "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_digests": [
+            "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": null
+        },
+        "transmission": {
+          "image_id": "sha256:5b3c27a96c8a37c878a525ebf377a32032c3a3acfe845ecaa7c3eb10b09c2caa",
+          "image_ref": "lscr.io/linuxserver/transmission@sha256:5b3c27a96c8a37c878a525ebf377a32032c3a3acfe845ecaa7c3eb10b09c2caa",
+          "image_digests": [
+            "lscr.io/linuxserver/transmission@sha256:5b3c27a96c8a37c878a525ebf377a32032c3a3acfe845ecaa7c3eb10b09c2caa"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": null
+        },
+        "rtorrent": {
+          "image_id": "sha256:412c1ee6a08e9c98c04a512c3132ebe56bffe8bb13903a38cc6ee26673bead91",
+          "image_ref": "torrent-bench-rtorrent:0.16.27",
+          "image_digests": [
+            "torrent-bench-rtorrent@sha256:412c1ee6a08e9c98c04a512c3132ebe56bffe8bb13903a38cc6ee26673bead91"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": [
+            "rtorrent",
+            "-n",
+            "-o",
+            "import=/config/rtorrent.rc"
+          ]
+        },
+        "rqbit": {
+          "image_id": "sha256:db3204d68b9a6327fc51f3bccb5048f04e4dcaf4f7737351e2a00ec997e46c17",
+          "image_ref": "ikatson/rqbit@sha256:db3204d68b9a6327fc51f3bccb5048f04e4dcaf4f7737351e2a00ec997e46c17",
+          "image_digests": [
+            "ikatson/rqbit@sha256:db3204d68b9a6327fc51f3bccb5048f04e4dcaf4f7737351e2a00ec997e46c17"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": [
+            "--disable-dht",
+            "--disable-lsd",
+            "--disable-upnp-port-forward",
+            "--ipv4-only",
+            "--listen-port",
+            "6881",
+            "--http-api-listen-addr",
+            "0.0.0.0:3030",
+            "-v",
+            "warn",
+            "server",
+            "start",
+            "--persistence-location",
+            "/config/db",
+            "/downloads"
+          ]
+        },
+        "aria2": {
+          "image_id": "sha256:e38cc97aca8ab7e662ee2072f2245f42f9cf475662966c22bad0f9b22d6d5079",
+          "image_ref": "torrent-bench-aria2:1.37.0",
+          "image_digests": [
+            "torrent-bench-aria2@sha256:e38cc97aca8ab7e662ee2072f2245f42f9cf475662966c22bad0f9b22d6d5079"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": [
+            "--no-conf=true",
+            "--enable-rpc=true",
+            "--rpc-listen-all=true",
+            "--rpc-listen-port=6800",
+            "--rpc-save-upload-metadata=false",
+            "--dir=/downloads",
+            "--enable-dht=false",
+            "--enable-dht6=false",
+            "--enable-peer-exchange=false",
+            "--bt-enable-lpd=false",
+            "--disable-ipv6=true",
+            "--listen-port=6881",
+            "--bt-max-peers=100",
+            "--max-concurrent-downloads=2000",
+            "--max-download-result=2000",
+            "--seed-ratio=0.0",
+            "--max-upload-limit=0",
+            "--max-overall-upload-limit=0",
+            "--console-log-level=warn",
+            "--summary-interval=0"
+          ]
+        },
+        "peer1": {
+          "image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_ref": "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_digests": [
+            "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": null
+        },
+        "peer2": {
+          "image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_ref": "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_digests": [
+            "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": null
+        },
+        "leech1": {
+          "image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_ref": "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_digests": [
+            "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": null
+        },
+        "leech2": {
+          "image_id": "sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_ref": "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc",
+          "image_digests": [
+            "lscr.io/linuxserver/deluge@sha256:1dbf9663387f85bb5805fcb1418a246f877e01374bb2a6cd9e632c72fb2e1ebc"
+          ],
+          "architecture": "arm64",
+          "host_config": {
+            "NanoCpus": 2000000000,
+            "Memory": 1610612736,
+            "MemorySwap": 1610612736,
+            "NetworkMode": "torrent-bench_lab"
+          },
+          "command": null
+        }
+      }
     }
   }
 }

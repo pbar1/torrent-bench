@@ -1,0 +1,5 @@
+# Minimal distribution package of upstream aria2's latest stable release.
+FROM alpine@sha256:be2656061b536c1883c4034790e21d0a09c5aaaf51968b89368a3c0371ea2c9a
+COPY apk-runtime.lock /apk-runtime.lock
+RUN apk add --no-cache $(cat /apk-runtime.lock)
+ENTRYPOINT ["aria2c"]

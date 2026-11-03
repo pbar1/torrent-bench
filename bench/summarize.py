@@ -6,7 +6,7 @@ import statistics
 from collections import defaultdict
 from pathlib import Path
 
-CLIENTS = ['qbittorrent', 'deluge', 'transmission', 'rtorrent', 'rqbit']
+CLIENTS = ['qbittorrent', 'deluge', 'transmission', 'rtorrent', 'rqbit', 'aria2']
 WORKLOADS = ['download-large', 'download-files', 'download-concurrent', 'download-shaped',
              'upload-2-peers', 'recheck-large', 'idle-empty', 'idle-64-seeds',
              'add-1000-paused', 'idle-1000-paused']

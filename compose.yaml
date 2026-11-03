@@ -53,6 +53,20 @@ services:
               --listen-port, '6881', --http-api-listen-addr, '0.0.0.0:3030',
               -v, warn, server, start, --persistence-location, /config/db, /downloads]
     volumes: [rqconfig:/config, rqdata:/downloads]
+  aria2:
+    <<: *client
+    build: ./aria2
+    image: torrent-bench-aria2:1.37.0
+    user: '1000:1000'
+    command: [--no-conf=true, --enable-rpc=true, --rpc-listen-all=true,
+              --rpc-listen-port=6800, --rpc-save-upload-metadata=false,
+              --dir=/downloads, --enable-dht=false, --enable-dht6=false,
+              --enable-peer-exchange=false, --bt-enable-lpd=false,
+              --disable-ipv6=true, --listen-port=6881, --bt-max-peers=100,
+              --max-concurrent-downloads=2000, --max-download-result=2000,
+              --seed-ratio=0.0, --max-upload-limit=0, --max-overall-upload-limit=0,
+              --console-log-level=warn, --summary-interval=0]
+    volumes: [aconfig:/config, adata:/downloads]
   peer1: &peer
     image: ${DELUGE_IMAGE:?}
     entrypoint: [/lsiopy/bin/python3, /bench/swarm.py]
@@ -97,6 +111,8 @@ services:
       - rdata:/clients/rtorrent/data
       - rqconfig:/clients/rqbit/config
       - rqdata:/clients/rqbit/data
+      - aconfig:/clients/aria2/config
+      - adata:/clients/aria2/data
       - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock
 
 networks:
@@ -114,6 +130,8 @@ volumes:
   rdata:
   rqconfig:
   rqdata:
+  aconfig:
+  adata:
   peer1data:
   peer2data:
   leech1data:

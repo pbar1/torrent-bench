@@ -6,15 +6,19 @@ import itertools
 import json
 from pathlib import Path
 
-from assemble_results import CLIENTS, PHASES, key
+from api import CLIENTS
+from assemble_results import PHASES, key
 
 
-def validate(path, repeats=3):
+def validate(path, repeats=3, clients=None):
     trials = json.loads((path / 'trials.json').read_text())
     complete = json.loads((path / 'complete.json').read_text())
     assert complete['ok'] and not complete['timeouts']
-    assert len(trials) == complete['trials'] == len(CLIENTS) * repeats * len(PHASES)
-    assert {key(t) for t in trials} == set(itertools.product(CLIENTS, range(repeats), PHASES))
+    clients = list(CLIENTS) if clients is None else clients
+    assert len(trials) == complete['trials'] == len(clients) * repeats * len(PHASES)
+    offsets = {t['repeat'] for t in trials}
+    assert len(offsets) == repeats
+    assert {key(t) for t in trials} == set(itertools.product(clients, offsets, PHASES))
     fixtures = json.loads((path / 'fixtures-manifest.json').read_text())
     groups = collections.defaultdict(list)
     for fixture in fixtures:
@@ -89,5 +93,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('directory', type=Path)
     parser.add_argument('--repeats', type=int, default=3)
+    parser.add_argument('--clients', nargs='+', choices=list(CLIENTS))
     args = parser.parse_args()
-    print(json.dumps(validate(args.directory, args.repeats), indent=2))
+    print(json.dumps(validate(args.directory, args.repeats, args.clients), indent=2))

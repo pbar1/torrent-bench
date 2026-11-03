@@ -1,11 +1,12 @@
 {
-  "rule": "Keep baseline non-qBittorrent cases; replace all qBittorrent cases; add Deluge repeat 2.",
+  "rule": "Keep baseline non-qBittorrent cases; replace all qBittorrent cases; add Deluge repeat 2. Add all three aria2 repetitions from the later extension run.",
   "reason": "Require observed recheck state and seed-ready completion; tolerate and disclose deferred disk writes.",
   "derived_metric_policy": "Recompute progress diagnostics from retained samples; suppress startup/active rates if progress resets. Wall times, payload rates and resource counters are unchanged.",
   "source_directories": {
     "baseline": "results/runs/baseline",
     "qbittorrent-corrected": "results/runs/qbittorrent-corrected",
-    "deluge-final-repeat": "results/runs/deluge-final-repeat"
+    "deluge-final-repeat": "results/runs/deluge-final-repeat",
+    "aria2": "results/runs/aria2"
   },
   "excluded_baseline_keys": [
     [
